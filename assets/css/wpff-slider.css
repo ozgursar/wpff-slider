@@ -136,9 +136,16 @@ a.wpff-slide {
     color: rgba(255, 255, 255, 0.92);
     font-size: clamp(0.8125rem, 2vw, 1rem);
     line-height: 1.55;
-    margin: 0;
     max-width: 55ch;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.wpff-slide__description p {
+    margin: 0 0 0.5em;
+}
+
+.wpff-slide__description p:last-child {
+    margin-bottom: 0;
 }
 
 /* Navigation dots

@@ -15,6 +15,7 @@
   const RangeControl = wp.components.RangeControl
   const UnitControl = wp.components.UnitControl || wp.components.__experimentalUnitControl
   const TextControl = wp.components.TextControl
+  const TextareaControl = wp.components.TextareaControl
   const CheckboxControl = wp.components.CheckboxControl
   const Button = wp.components.Button
   const Placeholder = wp.components.Placeholder
@@ -110,6 +111,32 @@
           PanelBody,
           { title: __('Slider Settings', 'wpff-slider'), initialOpen: true },
 
+          el(UnitControl, {
+            label: __('Slider height', 'wpff-slider'),
+            value: attributes.sliderHeight,
+            units: [
+              { value: 'px', label: 'px' },
+              { value: 'vh', label: 'vh' },
+              { value: '%', label: '%' }
+            ],
+            onChange: function (v) {
+              setAttributes({ sliderHeight: v })
+            }
+          }),
+
+          el(SelectControl, {
+            label: __('Image Focus Point', 'wpff-slider'),
+            value: attributes.objectPosition,
+            options: [
+              { value: 'top center',    label: __('Top',    'wpff-slider') },
+              { value: 'center center', label: __('Center', 'wpff-slider') },
+              { value: 'bottom center', label: __('Bottom', 'wpff-slider') }
+            ],
+            onChange: function (v) {
+              setAttributes({ objectPosition: v })
+            }
+          }),
+
           el(SelectControl, {
             label: __('Heading tag', 'wpff-slider'),
             value: attributes.headingTag,
@@ -125,32 +152,6 @@
             ],
             onChange: function (v) {
               setAttributes({ headingTag: v })
-            }
-          }),
-
-          el(UnitControl, {
-            label: __('Slider height', 'wpff-slider'),
-            value: attributes.sliderHeight,
-            units: [
-              { value: 'px', label: 'px' },
-              { value: 'vh', label: 'vh' },
-              { value: '%', label: '%' }
-            ],
-            onChange: function (v) {
-              setAttributes({ sliderHeight: v })
-            }
-          }),
-
-          el(SelectControl, {
-            label: __('Focus Point', 'wpff-slider'),
-            value: attributes.objectPosition,
-            options: [
-              { value: 'top center',    label: __('Top',    'wpff-slider') },
-              { value: 'center center', label: __('Center', 'wpff-slider') },
-              { value: 'bottom center', label: __('Bottom', 'wpff-slider') }
-            ],
-            onChange: function (v) {
-              setAttributes({ objectPosition: v })
             }
           }),
 
@@ -307,12 +308,12 @@
               updateSlide(idx, 'heading', v)
             }
           }),
-          el(TextControl, {
+          el(TextareaControl, {
             label: __('Description', 'wpff-slider'),
             value: slide.description,
             placeholder: __('Optional description', 'wpff-slider'),
             onChange: function (v) {
-              updateSlide(idx, 'description', v)
+              updateSlide(idx, 'description', v.replace(/\n{3,}/g, '\n\n'))
             }
           }),
           el(TextControl, {

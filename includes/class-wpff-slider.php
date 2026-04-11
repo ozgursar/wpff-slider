@@ -188,7 +188,7 @@ class WPFF_Slider {
 			$image_url = esc_url( $slide['imageUrl'] ?? '' );
 			$image_alt = esc_attr( $slide['imageAlt'] ?? '' );
 			$heading   = esc_html( $slide['heading'] ?? '' );
-			$desc      = esc_html( $slide['description'] ?? '' );
+			$desc      = $slide['description'] ?? '';
 			$link_url     = esc_url( $slide['linkUrl'] ?? '' );
 			$link_new_tab = ! empty( $slide['linkNewTab'] );
 
@@ -242,7 +242,9 @@ class WPFF_Slider {
 					);
 				}
 				if ( $desc ) {
-					$html .= '<p class="wpff-slide__description">' . $desc . '</p>';
+					$html .= '<div class="wpff-slide__description">'
+						. wpautop( wp_kses( $desc, array() ) )
+						. '</div>';
 				}
 
 				$html .= '</div>';
