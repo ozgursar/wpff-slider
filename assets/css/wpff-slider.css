@@ -1,0 +1,181 @@
+/* =============================================================================
+   WP Fix Fast — Ken Burns Slider  |  Frontend styles
+   ============================================================================= */
+
+/* Container
+   --------------------------------------------------------------------------- */
+
+.wpff-slider {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #000;
+    display: block;
+}
+
+/* All slides are stacked inside the track
+   --------------------------------------------------------------------------- */
+
+.wpff-slider__track {
+    position: absolute;
+    inset: 0;
+}
+
+.wpff-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    z-index: 0;
+    transition: opacity 0.8s ease-in-out;
+}
+
+.wpff-slide--active {
+    opacity: 1;
+    z-index: 1;
+}
+
+/* Leaving slide stays on top while it fades out so the incoming slide
+   can cross-fade in underneath it cleanly. */
+.wpff-slide--leaving {
+    opacity: 0;
+    z-index: 2;
+}
+
+/* Image
+   --------------------------------------------------------------------------- */
+
+.wpff-slide__image-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.wpff-slide__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit:      var(--wpff-object-fit,      cover);
+    object-position: var(--wpff-object-position, center center);
+    transform-origin: center center;
+    will-change: transform;
+}
+
+/* Ken Burns animation variants
+   Four different pan directions; PHP cycles slides through all four.
+   The animation is activated by adding `.wpff-kb-active` via JS.
+   --------------------------------------------------------------------------- */
+
+.wpff-slide__image.wpff-kb-active.wpff-kb-1 {
+    animation: wpff-kb-1 var(--wpff-anim-duration, 8s) ease-in-out forwards;
+}
+.wpff-slide__image.wpff-kb-active.wpff-kb-2 {
+    animation: wpff-kb-2 var(--wpff-anim-duration, 8s) ease-in-out forwards;
+}
+.wpff-slide__image.wpff-kb-active.wpff-kb-3 {
+    animation: wpff-kb-3 var(--wpff-anim-duration, 8s) ease-in-out forwards;
+}
+.wpff-slide__image.wpff-kb-active.wpff-kb-4 {
+    animation: wpff-kb-4 var(--wpff-anim-duration, 8s) ease-in-out forwards;
+}
+
+/* Zoom-in + pan */
+@keyframes wpff-kb-1 {
+    from { transform: scale(1.0)  translate3d( 0,    0,   0); }
+    to   { transform: scale(1.15) translate3d( 3%,  -3%,  0); }
+}
+@keyframes wpff-kb-2 {
+    from { transform: scale(1.0)  translate3d( 0,    0,   0); }
+    to   { transform: scale(1.15) translate3d(-3%,  -3%,  0); }
+}
+
+/* Zoom-out + pan (reverse feel) */
+@keyframes wpff-kb-3 {
+    from { transform: scale(1.15) translate3d( 3%,   3%,  0); }
+    to   { transform: scale(1.0)  translate3d( 0,    0,   0); }
+}
+@keyframes wpff-kb-4 {
+    from { transform: scale(1.15) translate3d(-3%,   3%,  0); }
+    to   { transform: scale(1.0)  translate3d( 0,    0,   0); }
+}
+
+/* Content overlay
+   --------------------------------------------------------------------------- */
+
+/* When the whole slide is a link, reset anchor defaults */
+a.wpff-slide {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.wpff-slide__content {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    /* Gradient only over the lower portion to avoid obscuring the full image */
+    background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
+    pointer-events: none;
+}
+
+.wpff-slide__heading {
+    color: #fff;
+    font-size: clamp(1.25rem, 4vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 0.5rem;
+    max-width: 70ch;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.wpff-slide__description {
+    color: rgba(255, 255, 255, 0.92);
+    font-size: clamp(0.8125rem, 2vw, 1rem);
+    line-height: 1.55;
+    margin: 0;
+    max-width: 55ch;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Navigation dots
+   --------------------------------------------------------------------------- */
+
+.wpff-slider__dots {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    padding: 1.25rem 1rem;
+}
+
+.wpff-slider__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.wpff-slider__dot--active,
+.wpff-slider__dot:hover {
+    background: #fff;
+    transform: scale(1.35);
+}
+
+.wpff-slider__dot:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}

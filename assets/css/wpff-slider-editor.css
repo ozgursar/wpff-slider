@@ -1,0 +1,140 @@
+/* =============================================================================
+   WP Fix Fast — Ken Burns Slider  |  Block editor UI styles
+   Only loaded inside the Gutenberg editor, never on the frontend.
+   ============================================================================= */
+
+.wpff-slider-editor-wrap {
+    background: #f0f0f1;
+    border-radius: 4px;
+    padding: 16px;
+}
+
+/* Slide list
+   --------------------------------------------------------------------------- */
+
+.wpff-slides-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Individual slide card
+   --------------------------------------------------------------------------- */
+
+.wpff-slide-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wpff-slide-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.wpff-slide-card__number {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e1e1e;
+}
+
+.wpff-slide-card__actions {
+    display: flex;
+    gap: 4px;
+}
+
+/* Image preview area
+   --------------------------------------------------------------------------- */
+
+.wpff-slide-card__preview {
+    position: relative;
+    overflow: hidden;
+    border-radius: 3px;
+    background: #000;
+}
+
+.wpff-slide-card__preview .wpff-slide-card__thumb {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+}
+
+.wpff-slide-card__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 1rem;
+    background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.65) 100%);
+    pointer-events: none;
+}
+
+.wpff-slide-card__overlay-heading {
+    display: block;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    margin: 0 0 3px;
+}
+
+.wpff-slide-card__overlay-desc {
+    display: block;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 11px;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    margin: 0;
+}
+
+.wpff-slide-card__overlay-link {
+    display: block;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 10px;
+    text-align: center;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.wpff-slide-card__image-btn.components-button {
+    width: 100%;
+    justify-content: center;
+    height: 80px;
+    border: 2px dashed #ccc !important;
+    border-radius: 3px;
+    gap: 6px;
+}
+
+.wpff-slide-card__image-btn.components-button:hover {
+    border-color: #007cba !important;
+}
+
+/* Add slide button
+   --------------------------------------------------------------------------- */
+
+.wpff-add-slide-btn.components-button {
+    width: 100%;
+    justify-content: center;
+    height: 44px;
+    border: 2px dashed #ccc !important;
+    border-radius: 4px;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.wpff-add-slide-btn.components-button:hover {
+    border-color: #007cba !important;
+}
