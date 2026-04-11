@@ -43,24 +43,24 @@ class WPFF_Slider {
 			array(
 				'render_callback' => array( $this, 'render_block' ),
 				'attributes'      => array(
-					'slides'            => array(
+					'slides'         => array(
 						'type'    => 'array',
 						'default' => array(),
 						'items'   => array( 'type' => 'object' ),
 					),
-					'kenBurns'          => array(
+					'kenBurns'       => array(
 						'type'    => 'boolean',
 						'default' => true,
 					),
-					'objectFit'         => array(
+					'objectFit'      => array(
 						'type'    => 'string',
 						'default' => 'cover',
 					),
-					'objectPosition'    => array(
+					'objectPosition' => array(
 						'type'    => 'string',
 						'default' => 'center center',
 					),
-					'slideDuration'     => array(
+					'slideDuration'  => array(
 						'type'    => 'integer',
 						'default' => 6,
 					),
@@ -186,16 +186,30 @@ class WPFF_Slider {
 			$slide_cls = 'wpff-slide' . ( $is_first ? ' wpff-slide--active' : '' );
 
 			$image_url = esc_url( $slide['imageUrl'] ?? '' );
-			$image_alt = esc_attr( $slide['imageAlt'] ?? '' );
-			$heading   = esc_html( $slide['heading'] ?? '' );
-			$desc      = $slide['description'] ?? '';
+			$image_id  = absint( $slide['imageId'] ?? 0 );
+
+			// Always prefer the live alt from the media library so edits made
+			// after the slide was saved are reflected without re-selecting the image.
+			$image_alt = $image_id > 0
+				? get_post_meta( $image_id, '_wp_attachment_image_alt', true )
+				: '';
+
+			if ( empty( $image_alt ) ) {
+				$image_alt = isset( $slide['imageAlt'] ) ? $slide['imageAlt'] : '';
+			}
+			if ( empty( $image_alt ) ) {
+				$image_alt = __( 'Slider image', 'wpff-slider' );
+			}
+			$image_alt    = esc_attr( $image_alt );
+			$heading      = esc_html( $slide['heading'] ?? '' );
+			$desc         = $slide['description'] ?? '';
 			$link_url     = esc_url( $slide['linkUrl'] ?? '' );
 			$link_new_tab = ! empty( $slide['linkNewTab'] );
 
 			// Use <a> as the slide wrapper when a link is present so the whole
 			// slide is clickable — no separate button needed.
 			if ( $link_url ) {
-				$aria_label = $heading ?: __( 'View slide', 'wpff-slider' );
+				$aria_label = ! empty( $heading ) ? $heading : __( 'View slide', 'wpff-slider' );
 				$target     = $link_new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
 				$html      .= sprintf(
 					'<a class="%s" href="%s" aria-label="%s"%s>',

@@ -237,7 +237,7 @@
                     return Object.assign({}, s, {
                       imageId: media.id,
                       imageUrl: media.url,
-                      imageAlt: media.alt || ''
+                      imageAlt: media.alt || __('Slider image', 'wpff-slider')
                     })
                   })
                 })
