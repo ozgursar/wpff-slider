@@ -48,6 +48,10 @@ class WPFF_Slider {
 						'default' => array(),
 						'items'   => array( 'type' => 'object' ),
 					),
+					'kenBurns'          => array(
+						'type'    => 'boolean',
+						'default' => true,
+					),
 					'objectFit'         => array(
 						'type'    => 'string',
 						'default' => 'cover',
@@ -135,9 +139,10 @@ class WPFF_Slider {
 		/* ---- sanitise & whitelist every value ---- */
 
 		$object_position = sanitize_text_field( $attributes['objectPosition'] ?? 'center center' );
-		$heading_tag    = sanitize_key( $attributes['headingTag'] ?? 'h2' );
-		$slider_height  = sanitize_text_field( $attributes['sliderHeight'] ?? '600px' );
-		$slide_duration = absint( $attributes['slideDuration'] ?? 6 );
+		$heading_tag     = sanitize_key( $attributes['headingTag'] ?? 'h2' );
+		$slider_height   = sanitize_text_field( $attributes['sliderHeight'] ?? '600px' );
+		$slide_duration  = absint( $attributes['slideDuration'] ?? 6 );
+		$ken_burns       = (bool) ( $attributes['kenBurns'] ?? true );
 
 		$position_whitelist = array(
 			'top center',
@@ -176,7 +181,7 @@ class WPFF_Slider {
 		$html .= '<div class="wpff-slider__track">';
 
 		foreach ( $slides as $i => $slide ) {
-			$kb_class  = $kb_variants[ $i % $kb_count ];
+			$kb_class  = $ken_burns ? $kb_variants[ $i % $kb_count ] : '';
 			$is_first  = ( 0 === $i );
 			$slide_cls = 'wpff-slide' . ( $is_first ? ' wpff-slide--active' : '' );
 

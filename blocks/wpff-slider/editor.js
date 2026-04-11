@@ -37,6 +37,7 @@
     attributes: {
       slides: { type: 'array', default: [] },
       objectPosition: { type: 'string', default: 'center center' },
+      kenBurns: { type: 'boolean', default: true },
       slideDuration: { type: 'integer', default: 6 },
       headingTag: { type: 'string', default: 'h2' },
       sliderHeight: { type: 'string', default: '600px' }
@@ -150,6 +151,14 @@
             ],
             onChange: function (v) {
               setAttributes({ objectPosition: v })
+            }
+          }),
+
+          el(CheckboxControl, {
+            label: __('Enable Ken Burns effect', 'wpff-slider'),
+            checked: attributes.kenBurns !== false,
+            onChange: function (v) {
+              setAttributes({ kenBurns: v })
             }
           }),
 
