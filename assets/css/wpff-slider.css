@@ -57,7 +57,7 @@
     overflow: hidden;
 }
 
-.wpff-slide__image {
+.wpff-slider .wpff-slide__image {
     display: block;
     width: 100%;
     height: 100%;
