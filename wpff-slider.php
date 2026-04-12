@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WP Fix Fast Slider
- * Description: Ken Burns pan-and-zoom image slider block for the WordPress block editor.
+ * Description: Full-width image slider block with Ken Burns pan-and-zoom effect, configurable slide duration, content positioning, text shadow, overlay gradient, and per-slide heading, description, and link controls.
  * Version:     1.0.0
  * Author:      WP Fix Fast
  * Author URI:  https://wpfixfast.com/

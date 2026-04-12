@@ -33,8 +33,8 @@
   // -------------------------------------------------------------------------
 
   registerBlockType('wpff-slider/slider', {
-    title: __('Ken Burns Slider', 'wpff-slider'),
-    description: __('Full-width image slider with Ken Burns pan-and-zoom effect.', 'wpff-slider'),
+    title: __('WPFF Slider', 'wpff-slider'),
+    description: __('Full-width image slider with Ken Burns pan-and-zoom effect, configurable content position, text shadow, overlay gradient, and per-slide heading, description, and link controls.', 'wpff-slider'),
     icon: 'slides',
     category: 'media',
 
@@ -452,7 +452,7 @@
           Placeholder,
           {
             icon: 'slides',
-            label: __('Ken Burns Slider', 'wpff-slider'),
+            label: __('WPFF Slider', 'wpff-slider'),
             instructions: __('Add your first slide to get started.', 'wpff-slider')
           },
           el(
