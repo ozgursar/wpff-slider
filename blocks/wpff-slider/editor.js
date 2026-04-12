@@ -200,6 +200,47 @@
             }
           }),
 
+          el(CheckboxControl, {
+            label: __('Enable Ken Burns effect', 'wpff-slider'),
+            checked: attributes.kenBurns !== false,
+            onChange: function (v) {
+              setAttributes({ kenBurns: v })
+            }
+          }),
+
+          el(CheckboxControl, {
+            label: __('Enable text shadow', 'wpff-slider'),
+            checked: attributes.textShadow !== false,
+            onChange: function (v) {
+              setAttributes({ textShadow: v })
+            }
+          }),
+
+          el(CheckboxControl, {
+            label: __('Enable overlay gradient', 'wpff-slider'),
+            checked: attributes.overlayGradient !== false,
+            onChange: function (v) {
+              setAttributes({ overlayGradient: v })
+            }
+          }),
+
+          el(RangeControl, {
+            label: __('Slide Duration (s)', 'wpff-slider'),
+            help: __('How long each slide is displayed.', 'wpff-slider'),
+            value: attributes.slideDuration,
+            min: 3,
+            max: 20,
+            onChange: function (v) {
+              setAttributes({ slideDuration: v })
+            }
+          }),
+
+        ),
+
+        el(
+          PanelBody,
+          { title: __('Text & Colors', 'wpff-slider'), initialOpen: false },
+
           el(BaseControl, {
             label: __('Heading size', 'wpff-slider'),
             __nextHasNoMarginBottom: true
@@ -262,42 +303,7 @@
                 setAttributes({ descriptionColor: v || '' })
               }
             })
-          ),
-
-          el(CheckboxControl, {
-            label: __('Enable Ken Burns effect', 'wpff-slider'),
-            checked: attributes.kenBurns !== false,
-            onChange: function (v) {
-              setAttributes({ kenBurns: v })
-            }
-          }),
-
-          el(CheckboxControl, {
-            label: __('Enable text shadow', 'wpff-slider'),
-            checked: attributes.textShadow !== false,
-            onChange: function (v) {
-              setAttributes({ textShadow: v })
-            }
-          }),
-
-          el(CheckboxControl, {
-            label: __('Enable overlay gradient', 'wpff-slider'),
-            checked: attributes.overlayGradient !== false,
-            onChange: function (v) {
-              setAttributes({ overlayGradient: v })
-            }
-          }),
-
-          el(RangeControl, {
-            label: __('Slide Duration (s)', 'wpff-slider'),
-            help: __('How long each slide is displayed.', 'wpff-slider'),
-            value: attributes.slideDuration,
-            min: 3,
-            max: 20,
-            onChange: function (v) {
-              setAttributes({ slideDuration: v })
-            }
-          }),
+          )
 
         )
       )

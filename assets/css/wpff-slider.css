@@ -147,7 +147,7 @@ a.wpff-slide {
   flex-direction: column;
   align-items: var(--wpff-content-align, center);
   justify-content: var(--wpff-content-justify, flex-end);
-  padding: 2.5rem 2rem;
+  padding: 2rem 2rem 3.5rem;
   text-align: var(--wpff-content-text-align, center);
   /* Gradient only over the lower portion to avoid obscuring the full image */
   background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
