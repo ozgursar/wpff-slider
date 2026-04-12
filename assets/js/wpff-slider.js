@@ -57,7 +57,7 @@
             // Update dots
             dots.forEach(function (dot, i) {
                 dot.classList.toggle('wpff-slider__dot--active', i === nextIndex);
-                dot.setAttribute('aria-selected', i === nextIndex ? 'true' : 'false');
+                dot.setAttribute('aria-current', i === nextIndex ? 'true' : 'false');
             });
 
             // The leaving slide rises to z-index 2 (above the incoming slide)

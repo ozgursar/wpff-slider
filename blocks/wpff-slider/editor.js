@@ -125,7 +125,7 @@
           }),
 
           el(SelectControl, {
-            label: __('Image Focus Point', 'wpff-slider'),
+            label: __('Image Focus', 'wpff-slider'),
             value: attributes.objectPosition,
             options: [
               { value: 'top center',    label: __('Top',    'wpff-slider') },

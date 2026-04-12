@@ -54,7 +54,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    object-fit:      var(--wpff-object-fit,      cover);
+    object-fit: cover;
     object-position: var(--wpff-object-position, center center);
     transform-origin: center center;
     will-change: transform;
@@ -96,6 +96,15 @@
 @keyframes wpff-kb-4 {
     from { transform: scale(1.15) translate3d(-3%,   3%,  0); }
     to   { transform: scale(1.0)  translate3d( 0,    0,   0); }
+}
+
+/* Reduced motion — disable Ken Burns for users who prefer less animation
+   --------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+    .wpff-slide__image {
+        animation: none;
+    }
 }
 
 /* Content overlay

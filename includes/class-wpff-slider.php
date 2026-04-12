@@ -52,10 +52,6 @@ class WPFF_Slider {
 						'type'    => 'boolean',
 						'default' => true,
 					),
-					'objectFit'      => array(
-						'type'    => 'string',
-						'default' => 'cover',
-					),
 					'objectPosition' => array(
 						'type'    => 'string',
 						'default' => 'center center',
@@ -63,6 +59,14 @@ class WPFF_Slider {
 					'slideDuration'  => array(
 						'type'    => 'integer',
 						'default' => 6,
+					),
+					'headingTag'     => array(
+						'type'    => 'string',
+						'default' => 'h2',
+					),
+					'sliderHeight'   => array(
+						'type'    => 'string',
+						'default' => '600px',
 					),
 				),
 			)
@@ -138,19 +142,19 @@ class WPFF_Slider {
 
 		/* ---- sanitise & whitelist every value ---- */
 
-		$object_position = sanitize_text_field( $attributes['objectPosition'] ?? 'center center' );
-		$heading_tag     = sanitize_key( $attributes['headingTag'] ?? 'h2' );
-		$slider_height   = sanitize_text_field( $attributes['sliderHeight'] ?? '600px' );
-		$slide_duration  = absint( $attributes['slideDuration'] ?? 6 );
-		$ken_burns       = (bool) ( $attributes['kenBurns'] ?? true );
+		$image_focus    = sanitize_text_field( $attributes['objectPosition'] ?? 'center center' );
+		$heading_tag    = sanitize_key( $attributes['headingTag'] ?? 'h2' );
+		$slider_height  = sanitize_text_field( $attributes['sliderHeight'] ?? '600px' );
+		$slide_duration = absint( $attributes['slideDuration'] ?? 6 );
+		$ken_burns      = (bool) ( $attributes['kenBurns'] ?? true );
 
 		$position_whitelist = array(
 			'top center',
 			'center center',
 			'bottom center',
 		);
-		$position_css       = in_array( $object_position, $position_whitelist, true )
-			? $object_position
+		$position_css       = in_array( $image_focus, $position_whitelist, true )
+			? $image_focus
 			: 'center center';
 
 		if ( ! preg_match( '/^[0-9]+(?:px|vh|%)$/', $slider_height ) ) {
@@ -160,10 +164,9 @@ class WPFF_Slider {
 		/* ---- container ---- */
 
 		$style = sprintf(
-			'height:%s;--wpff-anim-duration:%ds;--wpff-object-fit:%s;--wpff-object-position:%s;',
+			'height:%s;--wpff-anim-duration:%ds;--wpff-object-position:%s;',
 			$slider_height,
 			$slide_duration,
-			'cover',
 			$position_css
 		);
 
@@ -175,100 +178,16 @@ class WPFF_Slider {
 
 		/* ---- slides ---- */
 
-		$kb_variants = array( 'wpff-kb-1', 'wpff-kb-2', 'wpff-kb-3', 'wpff-kb-4' );
-		$kb_count    = count( $kb_variants );
+		$block_settings = array(
+			'heading_tag' => $heading_tag,
+			'ken_burns'   => $ken_burns,
+			'kb_variants' => array( 'wpff-kb-1', 'wpff-kb-2', 'wpff-kb-3', 'wpff-kb-4' ),
+		);
 
 		$html .= '<div class="wpff-slider__track">';
 
 		foreach ( $slides as $i => $slide ) {
-			$kb_class  = $ken_burns ? $kb_variants[ $i % $kb_count ] : '';
-			$is_first  = ( 0 === $i );
-			$slide_cls = 'wpff-slide' . ( $is_first ? ' wpff-slide--active' : '' );
-
-			$image_url = esc_url( $slide['imageUrl'] ?? '' );
-			$image_id  = absint( $slide['imageId'] ?? 0 );
-
-			// Always prefer the live alt from the media library so edits made
-			// after the slide was saved are reflected without re-selecting the image.
-			$image_alt = $image_id > 0
-				? get_post_meta( $image_id, '_wp_attachment_image_alt', true )
-				: '';
-
-			if ( empty( $image_alt ) ) {
-				$image_alt = isset( $slide['imageAlt'] ) ? $slide['imageAlt'] : '';
-			}
-			if ( empty( $image_alt ) ) {
-				$image_alt = __( 'Slider image', 'wpff-slider' );
-			}
-			$image_alt    = esc_attr( $image_alt );
-			$heading      = esc_html( $slide['heading'] ?? '' );
-			$desc         = $slide['description'] ?? '';
-			$link_url     = esc_url( $slide['linkUrl'] ?? '' );
-			$link_new_tab = ! empty( $slide['linkNewTab'] );
-
-			// Use <a> as the slide wrapper when a link is present so the whole
-			// slide is clickable — no separate button needed.
-			if ( $link_url ) {
-				$aria_label = ! empty( $heading ) ? $heading : __( 'View slide', 'wpff-slider' );
-				$target     = $link_new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
-				$html      .= sprintf(
-					'<a class="%s" href="%s" aria-label="%s"%s>',
-					esc_attr( $slide_cls ),
-					$link_url,
-					esc_attr( $aria_label ),
-					$target
-				);
-			} else {
-				$html .= sprintf( '<div class="%s">', esc_attr( $slide_cls ) );
-			}
-
-			// Image — use wp_get_attachment_image() so WordPress generates a full
-			// srcset/sizes, letting the browser pick the right size per viewport.
-			// Fall back to a plain <img> if no image ID is stored.
-			$img_attrs = array(
-				'class'         => 'wpff-slide__image ' . esc_attr( $kb_class ),
-				'alt'           => $image_alt,
-				'loading'       => $is_first ? 'eager' : 'lazy',
-				'fetchpriority' => $is_first ? 'high' : 'auto',
-				'decoding'      => $is_first ? 'sync' : 'async',
-				'sizes'         => '100vw',
-			);
-
-			$html .= '<div class="wpff-slide__image-wrap">';
-			$html .= $image_id > 0
-				? wp_get_attachment_image( $image_id, 'full', false, $img_attrs )
-				: sprintf(
-					'<img src="%s" alt="%s" class="%s" loading="%s" fetchpriority="%s" decoding="%s" />',
-					$image_url,
-					$image_alt,
-					esc_attr( $img_attrs['class'] ),
-					$img_attrs['loading'],
-					$img_attrs['fetchpriority'],
-					$img_attrs['decoding']
-				);
-			$html .= '</div>';
-
-			// Content overlay — heading and description only.
-			if ( $heading || $desc ) {
-				$html .= '<div class="wpff-slide__content">';
-
-				if ( $heading ) {
-					$html .= sprintf(
-						'<%1$s class="wpff-slide__heading">%2$s</%1$s>',
-						$heading_tag,
-						$heading
-					);
-				}
-				if ( $desc ) {
-					$html .= '<div class="wpff-slide__description">'
-						. wpautop( wp_kses( $desc, array() ) )
-						. '</div>';
-				}
-
-				$html .= '</div>';
-			}
-
-			$html .= $link_url ? '</a>' : '</div>'; // .wpff-slide
+			$html .= $this->render_slide( $slide, $i, $block_settings );
 		}
 
 		$html .= '</div>'; // .wpff-slider__track
@@ -277,13 +196,13 @@ class WPFF_Slider {
 
 		if ( count( $slides ) > 1 ) {
 			$html .= sprintf(
-				'<div class="wpff-slider__dots" role="tablist" aria-label="%s">',
-				esc_attr__( 'Slides', 'wpff-slider' )
+				'<div class="wpff-slider__dots" role="group" aria-label="%s">',
+				esc_attr__( 'Slide navigation', 'wpff-slider' )
 			);
 
 			foreach ( $slides as $i => $slide ) {
 				$html .= sprintf(
-					'<button class="wpff-slider__dot%s" role="tab" aria-selected="%s" aria-label="%s" data-index="%d"></button>',
+					'<button class="wpff-slider__dot%s" role="button" aria-current="%s" aria-label="%s" data-index="%d"></button>',
 					0 === $i ? ' wpff-slider__dot--active' : '',
 					0 === $i ? 'true' : 'false',
 					/* translators: %d: slide number */
@@ -296,6 +215,112 @@ class WPFF_Slider {
 		}
 
 		$html .= '</div>'; // .wpff-slider
+
+		return $html;
+	}
+
+	// -------------------------------------------------------------------------
+	// Single slide renderer
+	// -------------------------------------------------------------------------
+
+	private function render_slide( array $slide, int $i, array $block_settings ): string {
+
+		$heading_tag = $block_settings['heading_tag'];
+		$kb_variants = $block_settings['kb_variants'];
+		$kb_class    = $block_settings['ken_burns'] ? $kb_variants[ $i % count( $kb_variants ) ] : '';
+		$is_first    = ( 0 === $i );
+		$slide_cls   = 'wpff-slide' . ( $is_first ? ' wpff-slide--active' : '' );
+
+		$image_url = esc_url( $slide['imageUrl'] ?? '' );
+		$image_id  = absint( $slide['imageId'] ?? 0 );
+
+		// Always prefer the live alt from the media library so edits made
+		// after the slide was saved are reflected without re-selecting the image.
+		$image_alt = $image_id > 0
+			? get_post_meta( $image_id, '_wp_attachment_image_alt', true )
+			: '';
+
+		if ( empty( $image_alt ) ) {
+			$image_alt = isset( $slide['imageAlt'] ) ? $slide['imageAlt'] : '';
+		}
+		if ( empty( $image_alt ) ) {
+			$image_alt = __( 'Slider image', 'wpff-slider' );
+		}
+
+		$heading      = $slide['heading'] ?? '';
+		$desc         = $slide['description'] ?? '';
+		$link_url     = esc_url( $slide['linkUrl'] ?? '' );
+		$link_new_tab = ! empty( $slide['linkNewTab'] );
+
+		$html       = '';
+		$heading_id = ! empty( $heading ) ? wp_unique_id( 'wpff-heading-' ) : '';
+
+		// Use <a> as the slide wrapper when a link is present so the whole slide is clickable.
+		if ( $link_url ) {
+			$aria = $heading_id
+				? sprintf( 'aria-labelledby="%s"', esc_attr( $heading_id ) )
+					/* translators: %d: slide number */
+				: sprintf( 'aria-label="%s"', esc_attr( sprintf( __( 'Slide %d', 'wpff-slider' ), $i + 1 ) ) );
+			$target = $link_new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
+			$html  .= sprintf(
+				'<a class="%s" href="%s" %s%s>',
+				esc_attr( $slide_cls ),
+				$link_url,
+				$aria,
+				$target
+			);
+		} else {
+			$html .= sprintf( '<div class="%s">', esc_attr( $slide_cls ) );
+		}
+
+		// Image — use wp_get_attachment_image() so WordPress generates a full
+		// srcset/sizes, letting the browser pick the right size per viewport.
+		// Fall back to a plain <img> if no image ID is stored.
+		$img_attrs = array(
+			'class'         => 'wpff-slide__image ' . esc_attr( $kb_class ),
+			'alt'           => $image_alt,
+			'loading'       => $is_first ? 'eager' : 'lazy',
+			'fetchpriority' => $is_first ? 'high' : 'auto',
+			'decoding'      => $is_first ? 'sync' : 'async',
+			'sizes'         => '100vw',
+		);
+
+		$html .= '<div class="wpff-slide__image-wrap">';
+		$html .= $image_id > 0
+			? wp_get_attachment_image( $image_id, 'full', false, $img_attrs )
+			: sprintf(
+				'<img src="%s" alt="%s" class="%s" loading="%s" fetchpriority="%s" decoding="%s" sizes="100vw" />',
+				$image_url,
+				esc_attr( $image_alt ),
+				esc_attr( $img_attrs['class'] ),
+				$img_attrs['loading'],
+				$img_attrs['fetchpriority'],
+				$img_attrs['decoding']
+			);
+		$html .= '</div>';
+
+		// Content overlay — heading and description only.
+		if ( $heading || $desc ) {
+			$html .= '<div class="wpff-slide__content">';
+
+			if ( $heading ) {
+				$html .= sprintf(
+					'<%1$s id="%2$s" class="wpff-slide__heading">%3$s</%1$s>',
+					$heading_tag,
+					esc_attr( $heading_id ),
+					esc_html( $heading )
+				);
+			}
+			if ( $desc ) {
+				$html .= '<div class="wpff-slide__description">'
+					. wpautop( wp_kses( $desc, array() ) )
+					. '</div>';
+			}
+
+			$html .= '</div>';
+		}
+
+		$html .= $link_url ? '</a>' : '</div>'; // .wpff-slide
 
 		return $html;
 	}
