@@ -80,6 +80,10 @@ class WPFF_Slider {
 						'type'    => 'boolean',
 						'default' => true,
 					),
+					'overlayGradient'    => array(
+						'type'    => 'boolean',
+						'default' => true,
+					),
 				),
 			)
 		);
@@ -177,6 +181,7 @@ class WPFF_Slider {
 		$ken_burns            = (bool) ( $attributes['kenBurns'] ?? true );
 		$content_position     = sanitize_text_field( $attributes['contentPosition'] ?? 'bottom center' );
 		$text_shadow          = (bool) ( $attributes['textShadow'] ?? true );
+		$overlay_gradient     = (bool) ( $attributes['overlayGradient'] ?? true );
 
 		$position_whitelist = array(
 			'top center',
@@ -270,11 +275,12 @@ class WPFF_Slider {
 		/* ---- slides ---- */
 
 		$block_settings = array(
-			'heading_tag'     => $heading_tag,
-			'ken_burns'       => $ken_burns,
-			'kb_variants'     => array( 'wpff-kb-1', 'wpff-kb-2', 'wpff-kb-3', 'wpff-kb-4' ),
-			'text_shadow'     => $text_shadow,
-			'object_position' => $position_css,
+			'heading_tag'      => $heading_tag,
+			'ken_burns'        => $ken_burns,
+			'kb_variants'      => array( 'wpff-kb-1', 'wpff-kb-2', 'wpff-kb-3', 'wpff-kb-4' ),
+			'text_shadow'      => $text_shadow,
+			'object_position'  => $position_css,
+			'overlay_gradient' => $overlay_gradient,
 		);
 
 		$html .= '<div class="wpff-slider__track">';
@@ -386,7 +392,9 @@ class WPFF_Slider {
 
 		// Content overlay — heading and description only.
 		if ( $heading || $desc ) {
-			$content_cls = 'wpff-slide__content' . ( $block_settings['text_shadow'] ? '' : ' wpff-slide__content--no-shadow' );
+			$content_cls = 'wpff-slide__content'
+			. ( $block_settings['text_shadow'] ? '' : ' wpff-slide__content--no-shadow' )
+			. ( $block_settings['overlay_gradient'] ? '' : ' wpff-slide__content--no-gradient' );
 			$html .= sprintf( '<div class="%s">', esc_attr( $content_cls ) );
 
 			if ( $heading ) {

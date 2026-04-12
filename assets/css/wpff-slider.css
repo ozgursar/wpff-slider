@@ -161,6 +161,10 @@ a.wpff-slide {
     text-shadow: none;
 }
 
+.wpff-slide__content--no-gradient {
+    background: none;
+}
+
 .wpff-slide__description p {
     margin: 0 0 0.5em;
 }

@@ -45,7 +45,8 @@
       sliderHeight: { type: 'string', default: '600px' },
       sliderHeightMobile: { type: 'string', default: '' },
       contentPosition: { type: 'string', default: 'bottom center' },
-      textShadow: { type: 'boolean', default: true }
+      textShadow: { type: 'boolean', default: true },
+      overlayGradient: { type: 'boolean', default: true }
     },
 
     // -----------------------------------------------------------------
@@ -205,6 +206,14 @@
             checked: attributes.textShadow !== false,
             onChange: function (v) {
               setAttributes({ textShadow: v })
+            }
+          }),
+
+          el(CheckboxControl, {
+            label: __('Enable overlay gradient', 'wpff-slider'),
+            checked: attributes.overlayGradient !== false,
+            onChange: function (v) {
+              setAttributes({ overlayGradient: v })
             }
           }),
 
