@@ -362,7 +362,8 @@ class WPFF_Slider {
 
 	private function render_slide( array $slide, int $i, array $block_settings ): string {
 
-		$heading_tag = $block_settings['heading_tag'];
+		// H1 is only appropriate for the first slide; subsequent slides fall back to H2.
+		$heading_tag = ( 'h1' === $block_settings['heading_tag'] && $i > 0 ) ? 'h2' : $block_settings['heading_tag'];
 		$kb_variants = $block_settings['kb_variants'];
 		$kb_class    = $block_settings['ken_burns'] ? $kb_variants[ $i % count( $kb_variants ) ] : '';
 		$is_first    = ( 0 === $i );
