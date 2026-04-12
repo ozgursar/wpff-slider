@@ -64,9 +64,13 @@ class WPFF_Slider {
 						'type'    => 'string',
 						'default' => 'h2',
 					),
-					'sliderHeight'   => array(
+					'sliderHeight'        => array(
 						'type'    => 'string',
 						'default' => '600px',
+					),
+					'sliderHeightMobile'  => array(
+						'type'    => 'string',
+						'default' => '',
 					),
 				),
 			)
@@ -142,33 +146,41 @@ class WPFF_Slider {
 
 		/* ---- sanitise & whitelist every value ---- */
 
-		$image_focus    = sanitize_text_field( $attributes['objectPosition'] ?? 'center center' );
-		$heading_tag    = sanitize_key( $attributes['headingTag'] ?? 'h2' );
-		$slider_height  = sanitize_text_field( $attributes['sliderHeight'] ?? '600px' );
-		$slide_duration = absint( $attributes['slideDuration'] ?? 6 );
-		$ken_burns      = (bool) ( $attributes['kenBurns'] ?? true );
+		$image_focus          = sanitize_text_field( $attributes['objectPosition'] ?? 'center center' );
+		$heading_tag          = sanitize_key( $attributes['headingTag'] ?? 'h2' );
+		$slider_height        = sanitize_text_field( $attributes['sliderHeight'] ?? '600px' );
+		$slider_height_mobile = sanitize_text_field( $attributes['sliderHeightMobile'] ?? '' );
+		$slide_duration       = absint( $attributes['slideDuration'] ?? 6 );
+		$ken_burns            = (bool) ( $attributes['kenBurns'] ?? true );
 
 		$position_whitelist = array(
 			'top center',
 			'center center',
 			'bottom center',
 		);
-		$position_css       = in_array( $image_focus, $position_whitelist, true )
+		$position_css = in_array( $image_focus, $position_whitelist, true )
 			? $image_focus
 			: 'center center';
 
 		if ( ! preg_match( '/^[0-9]+(?:px|vh|%)$/', $slider_height ) ) {
 			$slider_height = '600px';
 		}
+		if ( ! preg_match( '/^[0-9]+(?:px|vh|%)$/', $slider_height_mobile ) ) {
+			$slider_height_mobile = '';
+		}
 
 		/* ---- container ---- */
 
 		$style = sprintf(
-			'height:%s;--wpff-anim-duration:%ds;--wpff-object-position:%s;',
+			'--wpff-slider-height:%s;--wpff-anim-duration:%ds;--wpff-object-position:%s;',
 			$slider_height,
 			$slide_duration,
 			$position_css
 		);
+
+		if ( $slider_height_mobile ) {
+			$style .= sprintf( '--wpff-slider-height-mobile:%s;', $slider_height_mobile );
+		}
 
 		$html = sprintf(
 			'<div class="wpff-slider" style="%s" data-slide-duration="%d">',

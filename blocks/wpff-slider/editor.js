@@ -41,7 +41,8 @@
       kenBurns: { type: 'boolean', default: true },
       slideDuration: { type: 'integer', default: 6 },
       headingTag: { type: 'string', default: 'h2' },
-      sliderHeight: { type: 'string', default: '600px' }
+      sliderHeight: { type: 'string', default: '600px' },
+      sliderHeightMobile: { type: 'string', default: '' }
     },
 
     // -----------------------------------------------------------------
@@ -121,6 +122,20 @@
             ],
             onChange: function (v) {
               setAttributes({ sliderHeight: v })
+            }
+          }),
+
+          el(UnitControl, {
+            label: __('Slider height (Mobile)', 'wpff-slider'),
+            value: attributes.sliderHeightMobile,
+            placeholder: __('Same as desktop', 'wpff-slider'),
+            units: [
+              { value: 'px', label: 'px' },
+              { value: 'vh', label: 'vh' },
+              { value: '%', label: '%' }
+            ],
+            onChange: function (v) {
+              setAttributes({ sliderHeightMobile: v })
             }
           }),
 

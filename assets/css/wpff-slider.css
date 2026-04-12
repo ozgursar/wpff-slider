@@ -8,9 +8,16 @@
 .wpff-slider {
     position: relative;
     width: 100%;
+    height: var(--wpff-slider-height, 600px);
     overflow: hidden;
     background: #000;
     display: block;
+}
+
+@media (max-width: 768px) {
+    .wpff-slider {
+        height: var(--wpff-slider-height-mobile, var(--wpff-slider-height, 600px));
+    }
 }
 
 /* All slides are stacked inside the track
