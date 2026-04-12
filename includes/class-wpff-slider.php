@@ -190,7 +190,10 @@ class WPFF_Slider {
 		/* ---- sanitise & whitelist every value ---- */
 
 		$image_focus          = sanitize_text_field( $attributes['objectPosition'] ?? 'center center' );
-		$heading_tag          = sanitize_key( $attributes['headingTag'] ?? 'h2' );
+		$allowed_heading_tags = array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span' );
+		$heading_tag          = in_array( $attributes['headingTag'] ?? 'h2', $allowed_heading_tags, true )
+			? $attributes['headingTag']
+			: 'h2';
 		$slider_height        = sanitize_text_field( $attributes['sliderHeight'] ?? '600px' );
 		$slider_height_mobile = sanitize_text_field( $attributes['sliderHeightMobile'] ?? '' );
 		$slide_duration       = absint( $attributes['slideDuration'] ?? 6 );
