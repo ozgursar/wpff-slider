@@ -222,26 +222,30 @@ class WPFF_Slider {
 				$html .= sprintf( '<div class="%s">', esc_attr( $slide_cls ) );
 			}
 
-			// Image
-			// First slide: all three loading-hint attributes are set explicitly so
-			// WordPress's wp_filter_content_tags leaves the tag untouched (it only
-			// modifies tags that are missing one or more of these attributes).
+			// Image — use wp_get_attachment_image() so WordPress generates a full
+			// srcset/sizes, letting the browser pick the right size per viewport.
+			// Fall back to a plain <img> if no image ID is stored.
+			$img_attrs = array(
+				'class'         => 'wpff-slide__image ' . esc_attr( $kb_class ),
+				'alt'           => $image_alt,
+				'loading'       => $is_first ? 'eager' : 'lazy',
+				'fetchpriority' => $is_first ? 'high' : 'auto',
+				'decoding'      => $is_first ? 'sync' : 'async',
+				'sizes'         => '100vw',
+			);
+
 			$html .= '<div class="wpff-slide__image-wrap">';
-			if ( $is_first ) {
-				$html .= sprintf(
-					'<img src="%s" alt="%s" class="wpff-slide__image %s" loading="eager" fetchpriority="high" decoding="sync" />',
+			$html .= $image_id > 0
+				? wp_get_attachment_image( $image_id, 'full', false, $img_attrs )
+				: sprintf(
+					'<img src="%s" alt="%s" class="%s" loading="%s" fetchpriority="%s" decoding="%s" />',
 					$image_url,
 					$image_alt,
-					esc_attr( $kb_class )
+					esc_attr( $img_attrs['class'] ),
+					$img_attrs['loading'],
+					$img_attrs['fetchpriority'],
+					$img_attrs['decoding']
 				);
-			} else {
-				$html .= sprintf(
-					'<img src="%s" alt="%s" class="wpff-slide__image %s" loading="lazy" decoding="async" />',
-					$image_url,
-					$image_alt,
-					esc_attr( $kb_class )
-				);
-			}
 			$html .= '</div>';
 
 			// Content overlay — heading and description only.
