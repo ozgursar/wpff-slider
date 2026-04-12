@@ -23,6 +23,16 @@
 
         if (slides.length === 0) return;
 
+        // Apply object-position from data attribute so it works in all contexts
+        // (CSS variables, inline styles, and editor SSR preview).
+        const objectPosition = sliderEl.dataset.objectPosition;
+        if (objectPosition) {
+            for (let i = 0; i < slides.length; i++) {
+                const img = slides[i].querySelector('.wpff-slide__image');
+                if (img) img.style.objectPosition = objectPosition;
+            }
+        }
+
         const slideDuration = parseInt(sliderEl.dataset.slideDuration, 10) * 1000 || 6000;
         let currentIndex  = 0;
         let timer         = null;
@@ -131,5 +141,27 @@
         document.addEventListener('DOMContentLoaded', initAll);
     } else {
         initAll();
+    }
+
+    // Watch for sliders injected after page load (e.g. Gutenberg ServerSideRender).
+    if (typeof MutationObserver !== 'undefined') {
+        const observer = new MutationObserver(function (mutations) {
+            for (let m = 0; m < mutations.length; m++) {
+                const added = mutations[m].addedNodes;
+                for (let n = 0; n < added.length; n++) {
+                    const node = added[n];
+                    if (node.nodeType !== 1) continue;
+                    if (node.classList && node.classList.contains('wpff-slider')) {
+                        initSlider(node);
+                    } else {
+                        const nested = node.querySelectorAll('.wpff-slider');
+                        for (let s = 0; s < nested.length; s++) {
+                            initSlider(nested[s]);
+                        }
+                    }
+                }
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
     }
 }());

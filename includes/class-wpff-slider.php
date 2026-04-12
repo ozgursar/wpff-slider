@@ -43,34 +43,42 @@ class WPFF_Slider {
 			array(
 				'render_callback' => array( $this, 'render_block' ),
 				'attributes'      => array(
-					'slides'         => array(
+					'slides'             => array(
 						'type'    => 'array',
 						'default' => array(),
 						'items'   => array( 'type' => 'object' ),
 					),
-					'kenBurns'       => array(
+					'kenBurns'           => array(
 						'type'    => 'boolean',
 						'default' => true,
 					),
-					'objectPosition' => array(
+					'objectPosition'     => array(
 						'type'    => 'string',
 						'default' => 'center center',
 					),
-					'slideDuration'  => array(
+					'slideDuration'      => array(
 						'type'    => 'integer',
 						'default' => 6,
 					),
-					'headingTag'     => array(
+					'headingTag'         => array(
 						'type'    => 'string',
 						'default' => 'h2',
 					),
-					'sliderHeight'        => array(
+					'sliderHeight'       => array(
 						'type'    => 'string',
 						'default' => '600px',
 					),
-					'sliderHeightMobile'  => array(
+					'sliderHeightMobile' => array(
 						'type'    => 'string',
 						'default' => '',
+					),
+					'contentPosition'    => array(
+						'type'    => 'string',
+						'default' => 'bottom center',
+					),
+					'textShadow'         => array(
+						'type'    => 'boolean',
+						'default' => true,
 					),
 				),
 			)
@@ -85,7 +93,7 @@ class WPFF_Slider {
 		wp_enqueue_script(
 			'wpff-slider-editor',
 			WPFF_SLIDER_URL . 'blocks/wpff-slider/editor.js',
-			array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ),
+			array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n', 'wp-server-side-render' ),
 			filemtime( WPFF_SLIDER_DIR . 'blocks/wpff-slider/editor.js' ),
 			true
 		);
@@ -95,6 +103,21 @@ class WPFF_Slider {
 			WPFF_SLIDER_URL . 'assets/css/wpff-slider-editor.css',
 			array(),
 			filemtime( WPFF_SLIDER_DIR . 'assets/css/wpff-slider-editor.css' )
+		);
+
+		// Frontend assets so the ServerSideRender preview looks and behaves like the frontend.
+		wp_enqueue_style(
+			'wpff-slider',
+			WPFF_SLIDER_URL . 'assets/css/wpff-slider.css',
+			array(),
+			filemtime( WPFF_SLIDER_DIR . 'assets/css/wpff-slider.css' )
+		);
+		wp_enqueue_script(
+			'wpff-slider',
+			WPFF_SLIDER_URL . 'assets/js/wpff-slider.js',
+			array(),
+			filemtime( WPFF_SLIDER_DIR . 'assets/js/wpff-slider.js' ),
+			true
 		);
 	}
 
@@ -152,15 +175,67 @@ class WPFF_Slider {
 		$slider_height_mobile = sanitize_text_field( $attributes['sliderHeightMobile'] ?? '' );
 		$slide_duration       = absint( $attributes['slideDuration'] ?? 6 );
 		$ken_burns            = (bool) ( $attributes['kenBurns'] ?? true );
+		$content_position     = sanitize_text_field( $attributes['contentPosition'] ?? 'bottom center' );
+		$text_shadow          = (bool) ( $attributes['textShadow'] ?? true );
 
 		$position_whitelist = array(
 			'top center',
 			'center center',
 			'bottom center',
 		);
-		$position_css = in_array( $image_focus, $position_whitelist, true )
+		$position_css       = in_array( $image_focus, $position_whitelist, true )
 			? $image_focus
 			: 'center center';
+
+		// Map "vertical horizontal" to flex values.
+		$content_position_map = array(
+			'top left'      => array(
+				'justify' => 'flex-start',
+				'align'   => 'flex-start',
+				'text'    => 'left',
+			),
+			'top center'    => array(
+				'justify' => 'flex-start',
+				'align'   => 'center',
+				'text'    => 'center',
+			),
+			'top right'     => array(
+				'justify' => 'flex-start',
+				'align'   => 'flex-end',
+				'text'    => 'right',
+			),
+			'center left'   => array(
+				'justify' => 'center',
+				'align'   => 'flex-start',
+				'text'    => 'left',
+			),
+			'center center' => array(
+				'justify' => 'center',
+				'align'   => 'center',
+				'text'    => 'center',
+			),
+			'center right'  => array(
+				'justify' => 'center',
+				'align'   => 'flex-end',
+				'text'    => 'right',
+			),
+			'bottom left'   => array(
+				'justify' => 'flex-end',
+				'align'   => 'flex-start',
+				'text'    => 'left',
+			),
+			'bottom center' => array(
+				'justify' => 'flex-end',
+				'align'   => 'center',
+				'text'    => 'center',
+			),
+			'bottom right'  => array(
+				'justify' => 'flex-end',
+				'align'   => 'flex-end',
+				'text'    => 'right',
+			),
+		);
+		$content_flex         = $content_position_map[ $content_position ] ?? $content_position_map['bottom center'];
 
 		if ( ! preg_match( '/^[0-9]+(?:px|vh|%)$/', $slider_height ) ) {
 			$slider_height = '600px';
@@ -172,10 +247,13 @@ class WPFF_Slider {
 		/* ---- container ---- */
 
 		$style = sprintf(
-			'--wpff-slider-height:%s;--wpff-anim-duration:%ds;--wpff-object-position:%s;',
+			'--wpff-slider-height:%s;--wpff-anim-duration:%ds;--wpff-object-position:%s;--wpff-content-justify:%s;--wpff-content-align:%s;--wpff-content-text-align:%s;',
 			$slider_height,
 			$slide_duration,
-			$position_css
+			$position_css,
+			$content_flex['justify'],
+			$content_flex['align'],
+			$content_flex['text']
 		);
 
 		if ( $slider_height_mobile ) {
@@ -183,17 +261,20 @@ class WPFF_Slider {
 		}
 
 		$html = sprintf(
-			'<div class="wpff-slider" style="%s" data-slide-duration="%d">',
+			'<div class="wpff-slider" style="%s" data-slide-duration="%d" data-object-position="%s">',
 			esc_attr( $style ),
-			$slide_duration
+			$slide_duration,
+			esc_attr( $position_css )
 		);
 
 		/* ---- slides ---- */
 
 		$block_settings = array(
-			'heading_tag' => $heading_tag,
-			'ken_burns'   => $ken_burns,
-			'kb_variants' => array( 'wpff-kb-1', 'wpff-kb-2', 'wpff-kb-3', 'wpff-kb-4' ),
+			'heading_tag'     => $heading_tag,
+			'ken_burns'       => $ken_burns,
+			'kb_variants'     => array( 'wpff-kb-1', 'wpff-kb-2', 'wpff-kb-3', 'wpff-kb-4' ),
+			'text_shadow'     => $text_shadow,
+			'object_position' => $position_css,
 		);
 
 		$html .= '<div class="wpff-slider__track">';
@@ -245,19 +326,9 @@ class WPFF_Slider {
 
 		$image_url = esc_url( $slide['imageUrl'] ?? '' );
 		$image_id  = absint( $slide['imageId'] ?? 0 );
-
-		// Always prefer the live alt from the media library so edits made
-		// after the slide was saved are reflected without re-selecting the image.
-		$image_alt = $image_id > 0
-			? get_post_meta( $image_id, '_wp_attachment_image_alt', true )
-			: '';
-
-		if ( empty( $image_alt ) ) {
-			$image_alt = isset( $slide['imageAlt'] ) ? $slide['imageAlt'] : '';
-		}
-		if ( empty( $image_alt ) ) {
-			$image_alt = __( 'Slider image', 'wpff-slider' );
-		}
+		$image_alt = __( 'Slider image', 'wpff-slider' );
+		$meta_alt  = $image_id > 0 ? get_post_meta( $image_id, '_wp_attachment_image_alt', true ) : '';
+		$image_alt = $meta_alt ?: $image_alt;
 
 		$heading      = $slide['heading'] ?? '';
 		$desc         = $slide['description'] ?? '';
@@ -290,6 +361,7 @@ class WPFF_Slider {
 		// Fall back to a plain <img> if no image ID is stored.
 		$img_attrs = array(
 			'class'         => 'wpff-slide__image ' . esc_attr( $kb_class ),
+			'style'         => 'object-position:' . esc_attr( $block_settings['object_position'] ) . ';',
 			'alt'           => $image_alt,
 			'loading'       => $is_first ? 'eager' : 'lazy',
 			'fetchpriority' => $is_first ? 'high' : 'auto',
@@ -301,10 +373,11 @@ class WPFF_Slider {
 		$html .= $image_id > 0
 			? wp_get_attachment_image( $image_id, 'full', false, $img_attrs )
 			: sprintf(
-				'<img src="%s" alt="%s" class="%s" loading="%s" fetchpriority="%s" decoding="%s" sizes="100vw" />',
+				'<img src="%s" alt="%s" class="%s" style="%s" loading="%s" fetchpriority="%s" decoding="%s" sizes="100vw" />',
 				$image_url,
 				esc_attr( $image_alt ),
 				esc_attr( $img_attrs['class'] ),
+				esc_attr( $img_attrs['style'] ),
 				$img_attrs['loading'],
 				$img_attrs['fetchpriority'],
 				$img_attrs['decoding']
@@ -313,7 +386,8 @@ class WPFF_Slider {
 
 		// Content overlay — heading and description only.
 		if ( $heading || $desc ) {
-			$html .= '<div class="wpff-slide__content">';
+			$content_cls = 'wpff-slide__content' . ( $block_settings['text_shadow'] ? '' : ' wpff-slide__content--no-shadow' );
+			$html .= sprintf( '<div class="%s">', esc_attr( $content_cls ) );
 
 			if ( $heading ) {
 				$html .= sprintf(

@@ -19,6 +19,7 @@
   const CheckboxControl = wp.components.CheckboxControl
   const Button = wp.components.Button
   const Placeholder = wp.components.Placeholder
+  const ServerSideRender = wp.serverSideRender
 
   function uid() {
     return Math.random().toString(36).slice(2, 9)
@@ -42,7 +43,9 @@
       slideDuration: { type: 'integer', default: 6 },
       headingTag: { type: 'string', default: 'h2' },
       sliderHeight: { type: 'string', default: '600px' },
-      sliderHeightMobile: { type: 'string', default: '' }
+      sliderHeightMobile: { type: 'string', default: '' },
+      contentPosition: { type: 'string', default: 'bottom center' },
+      textShadow: { type: 'boolean', default: true }
     },
 
     // -----------------------------------------------------------------
@@ -153,6 +156,25 @@
           }),
 
           el(SelectControl, {
+            label: __('Content Position', 'wpff-slider'),
+            value: attributes.contentPosition,
+            options: [
+              { value: 'top left',      label: __('Top Left',      'wpff-slider') },
+              { value: 'top center',    label: __('Top Center',    'wpff-slider') },
+              { value: 'top right',     label: __('Top Right',     'wpff-slider') },
+              { value: 'center left',   label: __('Center Left',   'wpff-slider') },
+              { value: 'center center', label: __('Center',        'wpff-slider') },
+              { value: 'center right',  label: __('Center Right',  'wpff-slider') },
+              { value: 'bottom left',   label: __('Bottom Left',   'wpff-slider') },
+              { value: 'bottom center', label: __('Bottom Center', 'wpff-slider') },
+              { value: 'bottom right',  label: __('Bottom Right',  'wpff-slider') }
+            ],
+            onChange: function (v) {
+              setAttributes({ contentPosition: v })
+            }
+          }),
+
+          el(SelectControl, {
             label: __('Heading tag', 'wpff-slider'),
             value: attributes.headingTag,
             options: [
@@ -178,6 +200,14 @@
             }
           }),
 
+          el(CheckboxControl, {
+            label: __('Enable text shadow', 'wpff-slider'),
+            checked: attributes.textShadow !== false,
+            onChange: function (v) {
+              setAttributes({ textShadow: v })
+            }
+          }),
+
           el(RangeControl, {
             label: __('Slide Duration (s)', 'wpff-slider'),
             help: __('How long each slide is displayed.', 'wpff-slider'),
@@ -192,7 +222,7 @@
         )
       )
 
-      /* ---- slide cards ---- */
+      /* ---- slide cards (edit controls only — preview via ServerSideRender) ---- */
 
       const cards = slides.map(function (slide, idx) {
         return el(
@@ -237,15 +267,12 @@
             )
           ),
 
-          // Image picker
+          // Compact image picker
           el(
             MediaUploadCheck,
             null,
             el(MediaUpload, {
               onSelect: function (media) {
-                // All three fields must go in one setAttributes call.
-                // Separate calls each read the stale `slides` snapshot
-                // and overwrite each other, leaving imageUrl empty.
                 setAttributes({
                   slides: slides.map(function (s, i) {
                     if (i !== idx) return s
@@ -263,41 +290,17 @@
                 if (slide.imageUrl) {
                   return el(
                     'div',
-                    null,
-                    el(
-                      'div',
-                      { className: 'wpff-slide-card__preview', style: { height: attributes.sliderHeight || '600px' } },
-                      el('img', {
-                        src: slide.imageUrl,
-                        alt: slide.imageAlt,
-                        className: 'wpff-slide-card__thumb',
-                        style: { objectPosition: attributes.objectPosition || 'center center' }
-                      }),
-                      (slide.heading || slide.description || slide.linkUrl)
-                        ? el(
-                            'div',
-                            { className: 'wpff-slide-card__overlay' },
-                            slide.heading
-                              ? el('strong', { className: 'wpff-slide-card__overlay-heading' }, slide.heading)
-                              : null,
-                            slide.description
-                              ? el('span', { className: 'wpff-slide-card__overlay-desc' }, slide.description)
-                              : null,
-                            slide.linkUrl
-                              ? el('span', { className: 'wpff-slide-card__overlay-link' }, slide.linkUrl)
-                              : null
-                          )
-                        : null
-                    ),
-                    el(
-                      Button,
-                      {
-                        variant: 'secondary',
-                        isSmall: true,
-                        onClick: ref.open
-                      },
-                      __('Replace image', 'wpff-slider')
-                    )
+                    { className: 'wpff-slide-card__thumb-wrap' },
+                    el('img', {
+                      src: slide.imageUrl,
+                      alt: slide.imageAlt,
+                      className: 'wpff-slide-card__thumb'
+                    }),
+                    el(Button, {
+                      variant: 'secondary',
+                      isSmall: true,
+                      onClick: ref.open
+                    }, __('Replace image', 'wpff-slider'))
                   )
                 }
                 return el(
@@ -379,6 +382,11 @@
         mainContent = el(
           'div',
           { className: 'wpff-slides-list' },
+          el(ServerSideRender, {
+            block: 'wpff-slider/slider',
+            attributes: attributes,
+            className: 'wpff-slider-ssr-preview'
+          }),
           cards,
           el(
             Button,

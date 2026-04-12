@@ -129,10 +129,10 @@ a.wpff-slide {
     z-index: 3;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
+    align-items: var(--wpff-content-align, center);
+    justify-content: var(--wpff-content-justify, flex-end);
     padding: 2.5rem 2rem;
-    text-align: center;
+    text-align: var(--wpff-content-text-align, center);
     /* Gradient only over the lower portion to avoid obscuring the full image */
     background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
     pointer-events: none;
@@ -156,6 +156,11 @@ a.wpff-slide {
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
+.wpff-slide__content--no-shadow .wpff-slide__heading,
+.wpff-slide__content--no-shadow .wpff-slide__description {
+    text-shadow: none;
+}
+
 .wpff-slide__description p {
     margin: 0 0 0.5em;
 }
@@ -177,7 +182,7 @@ a.wpff-slide {
     justify-content: center;
     align-items: center;
     gap: 7px;
-    padding: 1.25rem 1rem;
+    padding: 2.5rem 1rem 1.25rem;
 }
 
 .wpff-slider__dot {
