@@ -19,6 +19,9 @@
   const CheckboxControl = wp.components.CheckboxControl
   const Button = wp.components.Button
   const Placeholder = wp.components.Placeholder
+  const BaseControl = wp.components.BaseControl
+  const ColorPalette = wp.components.ColorPalette
+  const FontSizePicker = wp.blockEditor.FontSizePicker
   const ServerSideRender = wp.serverSideRender
 
   function uid() {
@@ -46,7 +49,11 @@
       sliderHeightMobile: { type: 'string', default: '' },
       contentPosition: { type: 'string', default: 'bottom center' },
       textShadow: { type: 'boolean', default: true },
-      overlayGradient: { type: 'boolean', default: true }
+      overlayGradient: { type: 'boolean', default: true },
+      headingFontSize: { type: 'string', default: '2.5rem' },
+      descriptionFontSize: { type: 'string', default: '1rem' },
+      headingColor: { type: 'string', default: '#ffffff' },
+      descriptionColor: { type: 'string', default: '#ffffff' }
     },
 
     // -----------------------------------------------------------------
@@ -192,6 +199,70 @@
               setAttributes({ headingTag: v })
             }
           }),
+
+          el(BaseControl, {
+            label: __('Heading size', 'wpff-slider'),
+            __nextHasNoMarginBottom: true
+          },
+            el(FontSizePicker, {
+              fontSizes: [
+                { name: 'S',  slug: 's',  size: '1.5rem' },
+                { name: 'M',  slug: 'm',  size: '2rem'   },
+                { name: 'L',  slug: 'l',  size: '2.5rem' },
+                { name: 'XL', slug: 'xl', size: '3.5rem' }
+              ],
+              value: attributes.headingFontSize,
+              onChange: function (v) {
+                setAttributes({ headingFontSize: v === undefined ? '2.5rem' : v })
+              },
+              withReset: true,
+              disableCustomFontSizes: false
+            })
+          ),
+
+          el(BaseControl, {
+            label: __('Description size', 'wpff-slider'),
+            __nextHasNoMarginBottom: true
+          },
+            el(FontSizePicker, {
+              fontSizes: [
+                { name: 'S',  slug: 's',  size: '0.875rem' },
+                { name: 'M',  slug: 'm',  size: '1rem'     },
+                { name: 'L',  slug: 'l',  size: '1.25rem'  },
+                { name: 'XL', slug: 'xl', size: '1.5rem'   }
+              ],
+              value: attributes.descriptionFontSize,
+              onChange: function (v) {
+                setAttributes({ descriptionFontSize: v === undefined ? '1rem' : v })
+              },
+              withReset: true,
+              disableCustomFontSizes: false
+            })
+          ),
+
+          el(BaseControl, {
+            label: __('Heading color', 'wpff-slider'),
+            __nextHasNoMarginBottom: true
+          },
+            el(ColorPalette, {
+              value: attributes.headingColor,
+              onChange: function (v) {
+                setAttributes({ headingColor: v || '' })
+              }
+            })
+          ),
+
+          el(BaseControl, {
+            label: __('Description color', 'wpff-slider'),
+            __nextHasNoMarginBottom: true
+          },
+            el(ColorPalette, {
+              value: attributes.descriptionColor,
+              onChange: function (v) {
+                setAttributes({ descriptionColor: v || '' })
+              }
+            })
+          ),
 
           el(CheckboxControl, {
             label: __('Enable Ken Burns effect', 'wpff-slider'),

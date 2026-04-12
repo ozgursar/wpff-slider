@@ -84,6 +84,22 @@ class WPFF_Slider {
 						'type'    => 'boolean',
 						'default' => true,
 					),
+					'headingFontSize'    => array(
+						'type'    => 'string',
+						'default' => '2.5rem',
+					),
+					'descriptionFontSize' => array(
+						'type'    => 'string',
+						'default' => '1rem',
+					),
+					'headingColor'       => array(
+						'type'    => 'string',
+						'default' => '#ffffff',
+					),
+					'descriptionColor'   => array(
+						'type'    => 'string',
+						'default' => '#ffffff',
+					),
 				),
 			)
 		);
@@ -182,6 +198,17 @@ class WPFF_Slider {
 		$content_position     = sanitize_text_field( $attributes['contentPosition'] ?? 'bottom center' );
 		$text_shadow          = (bool) ( $attributes['textShadow'] ?? true );
 		$overlay_gradient     = (bool) ( $attributes['overlayGradient'] ?? true );
+		$heading_font_size    = sanitize_text_field( $attributes['headingFontSize'] ?? '2.5rem' );
+		$desc_font_size       = sanitize_text_field( $attributes['descriptionFontSize'] ?? '1rem' );
+		$heading_color        = sanitize_text_field( $attributes['headingColor'] ?? '#ffffff' );
+		$desc_color           = sanitize_text_field( $attributes['descriptionColor'] ?? '#ffffff' );
+
+		if ( ! preg_match( '/^[0-9]+(?:\.[0-9]+)?(?:px|rem|em|vw|%)$/', $heading_font_size ) ) {
+			$heading_font_size = '2.5rem';
+		}
+		if ( ! preg_match( '/^[0-9]+(?:\.[0-9]+)?(?:px|rem|em|vw|%)$/', $desc_font_size ) ) {
+			$desc_font_size = '1rem';
+		}
 
 		$position_whitelist = array(
 			'top center',
@@ -263,6 +290,14 @@ class WPFF_Slider {
 
 		if ( $slider_height_mobile ) {
 			$style .= sprintf( '--wpff-slider-height-mobile:%s;', $slider_height_mobile );
+		}
+		$style .= '--wpff-heading-size:' . $heading_font_size . ';';
+		$style .= '--wpff-desc-size:' . $desc_font_size . ';';
+		if ( $heading_color ) {
+			$style .= '--wpff-heading-color:' . $heading_color . ';';
+		}
+		if ( $desc_color ) {
+			$style .= '--wpff-desc-color:' . $desc_color . ';';
 		}
 
 		$html = sprintf(

@@ -155,8 +155,8 @@ a.wpff-slide {
 }
 
 .wpff-slide__heading {
-  color: #fff;
-  font-size: clamp(1.25rem, 4vw, 2.5rem);
+  color: var(--wpff-heading-color, #fff);
+  font-size: clamp(1.25rem, 4vw, var(--wpff-heading-size, 2.5rem));
   font-weight: 700;
   line-height: 1.2;
   margin: 0 0 0.5rem;
@@ -165,8 +165,8 @@ a.wpff-slide {
 }
 
 .wpff-slide__description {
-  color: rgba(255, 255, 255, 0.92);
-  font-size: clamp(0.8125rem, 2vw, 1rem);
+  color: var(--wpff-desc-color, rgba(255, 255, 255, 0.92));
+  font-size: clamp(0.8125rem, 2vw, var(--wpff-desc-size, 1rem));
   line-height: 1.55;
   max-width: 55ch;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
