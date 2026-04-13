@@ -10,6 +10,7 @@
   const InspectorControls = wp.blockEditor.InspectorControls
   const MediaUpload = wp.blockEditor.MediaUpload
   const MediaUploadCheck = wp.blockEditor.MediaUploadCheck
+  const URLInput = wp.blockEditor.URLInput
   const PanelBody = wp.components.PanelBody
   const SelectControl = wp.components.SelectControl
   const RangeControl = wp.components.RangeControl
@@ -356,118 +357,147 @@
             )
           ),
 
-          // Compact image picker
+          // Image picker — full width, above the two columns
           el(
             MediaUploadCheck,
             null,
             el(MediaUpload, {
-              onSelect: function (media) {
-                setAttributes({
-                  slides: slides.map(function (s, i) {
-                    if (i !== idx) return s
-                    return Object.assign({}, s, {
-                      imageId: media.id,
-                      imageUrl: media.url,
-                      imageAlt: media.alt || __('Slider image', 'wpff-slider')
+                  onSelect: function (media) {
+                    setAttributes({
+                      slides: slides.map(function (s, i) {
+                        if (i !== idx) return s
+                        return Object.assign({}, s, {
+                          imageId: media.id,
+                          imageUrl: media.url,
+                          imageAlt: media.alt || __('Slider image', 'wpff-slider')
+                        })
+                      })
                     })
-                  })
-                })
-              },
-              allowedTypes: ['image'],
-              value: slide.imageId || 0,
-              render: function (ref) {
-                if (slide.imageUrl) {
-                  return el(
-                    'div',
-                    { className: 'wpff-slide-card__thumb-wrap' },
-                    el('img', {
-                      src: slide.imageUrl,
-                      alt: slide.imageAlt,
-                      className: 'wpff-slide-card__thumb'
-                    }),
-                    el(Button, {
-                      variant: 'secondary',
-                      isSmall: true,
-                      onClick: ref.open
-                    }, __('Replace image', 'wpff-slider'))
-                  )
-                }
-                return el(
-                  Button,
-                  {
-                    variant: 'secondary',
-                    onClick: ref.open,
-                    className: 'wpff-slide-card__image-btn',
-                    icon: 'format-image'
                   },
-                  __('Select image', 'wpff-slider')
-                )
-              }
-            })
-          ),
+                  allowedTypes: ['image'],
+                  value: slide.imageId || 0,
+                  render: function (ref) {
+                    if (slide.imageUrl) {
+                      return el(
+                        'div',
+                        { className: 'wpff-slide-card__thumb-wrap' },
+                        el('img', {
+                          src: slide.imageUrl,
+                          alt: slide.imageAlt,
+                          className: 'wpff-slide-card__thumb'
+                        }),
+                        el(Button, {
+                          variant: 'secondary',
+                          isSmall: true,
+                          onClick: ref.open
+                        }, __('Replace image', 'wpff-slider'))
+                      )
+                    }
+                    return el(
+                      Button,
+                      {
+                        variant: 'secondary',
+                        onClick: ref.open,
+                        className: 'wpff-slide-card__image-btn',
+                        icon: 'format-image'
+                      },
+                      __('Select image', 'wpff-slider')
+                    )
+                  }
+                })
+            ),
 
-          // Text fields
-          el(TextControl, {
-            label: __('Heading', 'wpff-slider'),
-            value: slide.heading,
-            placeholder: __('Optional heading', 'wpff-slider'),
-            onChange: function (v) {
-              updateSlide(idx, 'heading', v)
-            }
-          }),
-          el(TextareaControl, {
-            label: __('Description', 'wpff-slider'),
-            value: slide.description,
-            placeholder: __('Optional description', 'wpff-slider'),
-            onChange: function (v) {
-              updateSlide(idx, 'description', v.replace(/\n{3,}/g, '\n\n'))
-            }
-          }),
-          el(TextControl, {
-            label: __('Link URL', 'wpff-slider'),
-            value: slide.linkUrl,
-            type: 'url',
-            placeholder: 'https://',
-            onChange: function (v) {
-              updateSlide(idx, 'linkUrl', v)
-            }
-          }),
+          // Two-column body — heading/description | link options
+          el(
+            'div',
+            { className: 'wpff-slide-card__body' },
 
-          // Open in new tab, link style, button text — only shown when a URL is present
-          slide.linkUrl
-            ? el(CheckboxControl, {
-                label: __('Open in new tab', 'wpff-slider'),
-                checked: !!slide.linkNewTab,
+            // Column 1 — heading, description
+            el(
+              'div',
+              { className: 'wpff-slide-card__col' },
+
+              el(TextControl, {
+                label: __('Heading', 'wpff-slider'),
+                value: slide.heading,
+                placeholder: __('Optional heading', 'wpff-slider'),
+                autoComplete: 'off',
                 onChange: function (v) {
-                  updateSlide(idx, 'linkNewTab', v)
+                  updateSlide(idx, 'heading', v)
+                }
+              }),
+              el(TextareaControl, {
+                label: __('Description', 'wpff-slider'),
+                value: slide.description,
+                placeholder: __('Optional description', 'wpff-slider'),
+                onChange: function (v) {
+                  updateSlide(idx, 'description', v.replace(/\n{3,}/g, '\n\n'))
                 }
               })
-            : null,
+            ),
 
-          slide.linkUrl
-            ? el(RadioControl, {
-                label: __('Link style', 'wpff-slider'),
-                selected: slide.linkStyle || 'full',
-                options: [
-                  { label: __('Full slide clickable', 'wpff-slider'), value: 'full' },
-                  { label: __('Button', 'wpff-slider'), value: 'button' }
-                ],
-                onChange: function (v) {
-                  updateSlide(idx, 'linkStyle', v)
-                }
-              })
-            : null,
+            // Column 2 — link URL and conditional link options
+            el(
+              'div',
+              { className: 'wpff-slide-card__col' },
 
-          slide.linkUrl && slide.linkStyle === 'button'
-            ? el(TextControl, {
-                label: __('Button text', 'wpff-slider'),
-                value: slide.linkText || '',
-                placeholder: __('Learn More', 'wpff-slider'),
-                onChange: function (v) {
-                  updateSlide(idx, 'linkText', v)
-                }
-              })
-            : null
+              el(
+                'div',
+                { className: 'wpff-url-input-wrap' },
+                el(
+                  'label',
+                  { className: 'wpff-url-input-wrap__label' },
+                  __('Link URL', 'wpff-slider')
+                ),
+                el(URLInput, {
+                  value: slide.linkUrl,
+                  placeholder: 'https://',
+                  autoComplete: 'off',
+                  onChange: function (v) {
+                    updateSlide(idx, 'linkUrl', v)
+                  }
+                })
+              ),
+
+              slide.linkUrl
+                ? el(CheckboxControl, {
+                    label: __('Open in new tab', 'wpff-slider'),
+                    checked: !!slide.linkNewTab,
+                    onChange: function (v) {
+                      updateSlide(idx, 'linkNewTab', v)
+                    }
+                  })
+                : null,
+
+              slide.linkUrl
+                ? el(
+                    'div',
+                    { className: 'wpff-link-style-row' },
+                    el(RadioControl, {
+                      label: __('Link style', 'wpff-slider'),
+                      selected: slide.linkStyle || 'full',
+                      options: [
+                        { label: __('Full slide clickable', 'wpff-slider'), value: 'full' },
+                        { label: __('Button', 'wpff-slider'), value: 'button' }
+                      ],
+                      onChange: function (v) {
+                        updateSlide(idx, 'linkStyle', v)
+                      }
+                    }),
+                    slide.linkStyle === 'button'
+                      ? el(TextControl, {
+                          label: __('Button text', 'wpff-slider'),
+                          value: slide.linkText || '',
+                          placeholder: __('Learn More', 'wpff-slider'),
+                          onChange: function (v) {
+                            updateSlide(idx, 'linkText', v)
+                          }
+                        })
+                      : null
+                  )
+                : null
+            )
+          )
         )
       })
 

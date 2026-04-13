@@ -4,111 +4,174 @@
    ============================================================================= */
 
 .wpff-slider-editor-wrap {
-    background: #f0f0f1;
-    border-radius: 4px;
-    padding: 16px;
+  background: #f0f0f1;
+  border-radius: 4px;
+  padding: 16px;
 }
 
 /* Slide list
    --------------------------------------------------------------------------- */
 
 .wpff-slides-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 /* Individual slide card
    --------------------------------------------------------------------------- */
 
 .wpff-slide-card {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.wpff-slide-card__body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.wpff-slide-card__col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 1024px) {
+  .wpff-slide-card__body {
+    grid-template-columns: 1fr;
+  }
 }
 
 .wpff-slide-card__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #f0f0f1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f1;
 }
 
 .wpff-slide-card__number {
-    font-size: 13px;
-    font-weight: 600;
-    color: #1e1e1e;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1e1e;
 }
 
 .wpff-slide-card__actions {
-    display: flex;
-    gap: 4px;
+  display: flex;
+  gap: 4px;
 }
 
 /* Compact image thumbnail
    --------------------------------------------------------------------------- */
 
 .wpff-slide-card__thumb-wrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .wpff-slide-card__thumb {
-    width: 80px;
-    height: 56px;
-    object-fit: cover;
-    border-radius: 3px;
-    flex-shrink: 0;
-    background: #000;
+  width: 90px !important;
+  height: 90px !important;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background: #000;
 }
 
 .wpff-slide-card__image-btn.components-button {
-    width: 100%;
-    justify-content: center;
-    height: 80px;
-    border: 2px dashed #ccc !important;
-    border-radius: 3px;
-    gap: 6px;
+  width: 100%;
+  justify-content: center;
+  height: 80px;
+  border: 2px dashed #ccc !important;
+  border-radius: 3px;
+  gap: 6px;
 }
 
 .wpff-slide-card__image-btn.components-button:hover {
-    border-color: #007cba !important;
+  border-color: #007cba !important;
+}
+
+/* Match TextControl input height to URLInput (40px)
+   --------------------------------------------------------------------------- */
+
+.wpff-slide-card__col .components-text-control__input {
+  height: 40px;
+}
+
+/* URL input field
+   --------------------------------------------------------------------------- */
+
+.wpff-url-input-wrap {
+  margin-top: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wpff-url-input-wrap__label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #1e1e1e;
+  letter-spacing: 0.05em;
+}
+
+/* Match the autocomplete suggestions width to the input */
+.wpff-url-input-wrap .block-editor-url-input__suggestions {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Link style + button text inline row
+   --------------------------------------------------------------------------- */
+
+.wpff-link-style-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.wpff-link-style-row > * {
+  flex: 1;
 }
 
 /* ServerSideRender live preview
    --------------------------------------------------------------------------- */
 
 .wpff-slider-ssr-preview {
-    margin-bottom: 12px;
-    border-radius: 4px;
-    overflow: hidden;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 /* Linked slides use cursor:pointer from the frontend CSS.
    In the editor that cursor is misleading since clicking selects the block. */
 .wpff-slider-ssr-preview a.wpff-slide {
-    cursor: default;
+  cursor: default;
 }
 
 /* Add slide button
    --------------------------------------------------------------------------- */
 
 .wpff-add-slide-btn.components-button {
-    width: 100%;
-    justify-content: center;
-    height: 44px;
-    border: 2px dashed #ccc !important;
-    border-radius: 4px;
-    gap: 6px;
-    margin-top: 4px;
+  width: 100%;
+  justify-content: center;
+  height: 44px;
+  border: 2px dashed #ccc !important;
+  border-radius: 4px;
+  gap: 6px;
+  margin-top: 4px;
 }
 
 .wpff-add-slide-btn.components-button:hover {
-    border-color: #007cba !important;
+  border-color: #007cba !important;
 }
