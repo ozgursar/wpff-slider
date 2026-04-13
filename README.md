@@ -4,7 +4,8 @@ A WordPress Gutenberg block that renders a full-width image slider with a Ken Bu
 
 ## Features
 
-- **Ken Burns effect** — four alternating pan-and-zoom animations cycle across slides
+- **Ken Burns effect** — four alternating pan-and-zoom animations cycle across slides (toggle on/off)
+- **Fade In/Out effect** — heading, description, and button animate in/out on slide transitions (toggle on/off)
 - **Cross-fade transitions** — smooth opacity-based slide transitions with configurable duration (3–20 seconds per slide)
 - **Navigation dots** — accessible dot navigation with hover and focus styles; hidden when only one slide is present
 - **Hover pause** — auto-play pauses when the user hovers over the slider
@@ -78,7 +79,7 @@ The following source → output pairs are processed:
 4. Add more slides with the **Add Slide** button
 5. Reorder or remove slides using the arrow and trash buttons on each slide card
 6. Adjust appearance settings in the sidebar panels:
-   - **Slider Settings** — height, image focus, content position, heading tag, Ken Burns, text shadow, gradient, slide duration
+   - **Slider Settings** — height, image focus, content position, heading tag, Ken Burns, Fade In/Out, text shadow, gradient, slide duration
    - **Text & Colors** — heading size, description size, heading color, description color
    - **Shortcode** — shows the `[wpff_slider]` shortcode when editing a Synced Pattern
 
@@ -97,17 +98,18 @@ Changes made to the Synced Pattern are reflected everywhere the shortcode is use
 
 ### Slider Settings panel
 
-| Setting                 | Default             | Description                                                      |
-| ----------------------- | ------------------- | ---------------------------------------------------------------- |
-| Slider height           | `600px`             | Height of the slider on desktop. Accepts `px`, `vh`, or `%`      |
-| Slider height (Mobile)  | _(same as desktop)_ | Override height on screens ≤ 768 px                              |
-| Image Focus             | Center              | Where the image is anchored when cropped (Top / Center / Bottom) |
-| Content Position        | Bottom Center       | Where the heading and description appear on the slide            |
-| Heading tag             | H2                  | HTML element used for the slide heading                          |
-| Enable Ken Burns effect | On                  | Toggles the pan-and-zoom animation                               |
-| Enable text shadow      | On                  | Toggles a soft drop-shadow behind heading and description        |
-| Enable overlay gradient | On                  | Toggles a bottom-darkening gradient for text legibility          |
-| Slide Duration          | 6 s                 | How long each slide is displayed before advancing                |
+| Setting                   | Default             | Description                                                      |
+| ------------------------- | ------------------- | ---------------------------------------------------------------- |
+| Slider height             | `600px`             | Height of the slider on desktop. Accepts `px`, `vh`, or `%`      |
+| Slider height (Mobile)    | _(same as desktop)_ | Override height on screens ≤ 768 px                              |
+| Image Focus               | Center              | Where the image is anchored when cropped (Top / Center / Bottom) |
+| Content Position          | Bottom Center       | Where the heading and description appear on the slide            |
+| Heading tag               | H2                  | HTML element used for the slide heading                          |
+| Enable Ken Burns effect   | On                  | Toggles the pan-and-zoom animation                               |
+| Enable Fade In/Out effect | On                  | Toggles the fade-up/fade-down animation on slide content         |
+| Enable text shadow        | On                  | Toggles a soft drop-shadow behind heading and description        |
+| Enable overlay gradient   | On                  | Toggles a bottom-darkening gradient for text legibility          |
+| Slide Duration            | 6 s                 | How long each slide is displayed before advancing                |
 
 ### Text & Colors panel
 
@@ -120,15 +122,15 @@ Changes made to the Synced Pattern are reflected everywhere the shortcode is use
 
 ### Per-slide fields
 
-| Field           | Description                                                                           |
-| --------------- | ------------------------------------------------------------------------------------- |
-| Image           | Required. Select or replace from the Media Library                                    |
-| Heading         | Optional slide title                                                                  |
-| Description     | Optional body text. Supports multiple paragraphs                                      |
-| Link URL        | Type a URL or search for a post or page by name                                       |
-| Open in new tab | Shown only when a link URL is set                                                     |
-| Link style      | **Full slide clickable** (default) or **Button** — shown only when a link URL is set  |
-| Button text     | Label for the button. Defaults to "Learn More" if left empty                          |
+| Field           | Description                                                                          |
+| --------------- | ------------------------------------------------------------------------------------ |
+| Image           | Required. Select or replace from the Media Library                                   |
+| Heading         | Optional slide title                                                                 |
+| Description     | Optional body text. Supports multiple paragraphs                                     |
+| Link URL        | Type a URL or search for a post or page by name                                      |
+| Open in new tab | Shown only when a link URL is set                                                    |
+| Link style      | **Full slide clickable** (default) or **Button** — shown only when a link URL is set |
+| Button text     | Label for the button. Defaults to "Learn More" if left empty                         |
 
 ## How It Works
 
