@@ -208,6 +208,7 @@ a.wpff-slide {
   align-items: var(--wpff-content-align, center);
   justify-content: var(--wpff-content-justify, flex-end);
   max-width: var(--wp--style--global--content-size, 1200px);
+  margin: 0 auto;
   padding: 2rem 2rem 3.5rem;
   text-align: var(--wpff-content-text-align, center);
   /* Gradient only over the lower portion to avoid obscuring the full image */
