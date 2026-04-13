@@ -304,7 +304,9 @@ class WPFF_Slider {
 		}
 
 		$html = sprintf(
-			'<div class="wpff-slider" style="%s" data-slide-duration="%d" data-object-position="%s">',
+			'<div class="wpff-slider" role="region" aria-roledescription="%s" aria-label="%s" style="%s" data-slide-duration="%d" data-object-position="%s">',
+			esc_attr__( 'carousel', 'wpff-slider' ),
+			esc_attr__( 'Image slider', 'wpff-slider' ),
 			esc_attr( $style ),
 			$slide_duration,
 			esc_attr( $position_css )
@@ -339,7 +341,7 @@ class WPFF_Slider {
 
 			foreach ( $slides as $i => $slide ) {
 				$html .= sprintf(
-					'<button class="wpff-slider__dot%s" role="button" aria-current="%s" aria-label="%s" data-index="%d"></button>',
+					'<button class="wpff-slider__dot%s" aria-pressed="%s" aria-label="%s" data-index="%d"></button>',
 					0 === $i ? ' wpff-slider__dot--active' : '',
 					0 === $i ? 'true' : 'false',
 					/* translators: %d: slide number */
@@ -393,21 +395,33 @@ class WPFF_Slider {
 		$html       = '';
 		$heading_id = ! empty( $heading ) ? wp_unique_id( 'wpff-heading-' ) : '';
 
+		$aria_hidden  = $is_first ? 'false' : 'true';
+		$inert_attr   = $is_first ? '' : ' inert';
+
 		// Use <a> as the slide wrapper when full-slide link is selected.
 		if ( $use_full_link ) {
-			$aria  = $heading_id
-				? sprintf( 'aria-labelledby="%s"', esc_attr( $heading_id ) )
-					/* translators: %d: slide number */
-				: sprintf( 'aria-label="%s"', esc_attr( sprintf( __( 'Slide %d', 'wpff-slider' ), $i + 1 ) ) );
+			if ( $heading_id ) {
+				$aria = sprintf( 'aria-labelledby="%s"', esc_attr( $heading_id ) );
+			} else {
+				/* translators: %d: slide number */
+				$slide_label = sprintf( __( 'Slide %d', 'wpff-slider' ), $i + 1 );
+				if ( $link_new_tab ) {
+					/* translators: appended to link label when link opens in a new tab */
+					$slide_label .= ', ' . __( 'opens in new tab', 'wpff-slider' );
+				}
+				$aria = sprintf( 'aria-label="%s"', esc_attr( $slide_label ) );
+			}
 			$html .= sprintf(
-				'<a class="%s" href="%s" %s%s>',
+				'<a class="%s" href="%s" %s%s aria-hidden="%s"%s>',
 				esc_attr( $slide_cls ),
 				$link_url,
 				$aria,
-				$target
+				$target,
+				$aria_hidden,
+				$inert_attr
 			);
 		} else {
-			$html .= sprintf( '<div class="%s">', esc_attr( $slide_cls ) );
+			$html .= sprintf( '<div class="%s" aria-hidden="%s"%s>', esc_attr( $slide_cls ), $aria_hidden, $inert_attr );
 		}
 
 		// Image — use wp_get_attachment_image() so WordPress generates a full
@@ -460,16 +474,31 @@ class WPFF_Slider {
 					. '</div>';
 			}
 			if ( $use_button ) {
-				$btn_label = $link_text ? esc_html( $link_text ) : esc_html__( 'Learn More', 'wpff-slider' );
-				$html     .= sprintf(
-					'<a class="wpff-slide__button" href="%s"%s>%s</a>',
+				$btn_label      = $link_text ? esc_html( $link_text ) : esc_html__( 'Learn More', 'wpff-slider' );
+				$new_tab_notice = $link_new_tab
+					/* translators: appended to button label when link opens in a new tab */
+					? '<span class="wpff-sr-only">' . esc_html__( ', opens in new tab', 'wpff-slider' ) . '</span>'
+					: '';
+				$html          .= sprintf(
+					'<a class="wpff-slide__button" href="%s"%s>%s%s</a>',
 					$link_url,
 					$target,
-					$btn_label
+					$btn_label,
+					$new_tab_notice
 				);
 			}
 
 			$html .= '</div>';
+		}
+
+		// When a heading labels the full-slide link and it opens in a new tab,
+		// aria-labelledby can't be appended to, so a hidden span carries the notice.
+		if ( $use_full_link && $link_new_tab && $heading_id ) {
+			$html .= sprintf(
+				'<span class="wpff-sr-only">%s</span>',
+				/* translators: appended to screen-reader label when link opens in a new tab */
+				esc_html__( ', opens in new tab', 'wpff-slider' )
+			);
 		}
 
 		$html .= $use_full_link ? '</a>' : '</div>'; // .wpff-slide

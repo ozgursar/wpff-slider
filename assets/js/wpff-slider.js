@@ -67,8 +67,12 @@
             // Update dots
             dots.forEach(function (dot, i) {
                 dot.classList.toggle('wpff-slider__dot--active', i === nextIndex);
-                dot.setAttribute('aria-current', i === nextIndex ? 'true' : 'false');
+                dot.setAttribute('aria-pressed', i === nextIndex ? 'true' : 'false');
             });
+
+            // Make incoming slide accessible and interactive immediately
+            nextSlide.removeAttribute('inert');
+            nextSlide.setAttribute('aria-hidden', 'false');
 
             // The leaving slide rises to z-index 2 (above the incoming slide)
             // and fades out; the incoming slide fades in underneath it.
@@ -82,6 +86,8 @@
 
             setTimeout(function () {
                 prevSlide.classList.remove('wpff-slide--active', 'wpff-slide--leaving');
+                prevSlide.setAttribute('aria-hidden', 'true');
+                prevSlide.setAttribute('inert', '');
                 isAnimating = false;
             }, TRANSITION_MS);
         }
