@@ -143,6 +143,51 @@
   .wpff-slide__image {
     animation: none;
   }
+  .wpff-slider--content-anim .wpff-slide--active .wpff-slide__heading,
+  .wpff-slider--content-anim .wpff-slide--active .wpff-slide__description,
+  .wpff-slider--content-anim .wpff-slide--active .wpff-slide__button,
+  .wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__heading,
+  .wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__description,
+  .wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__button {
+    animation: none;
+  }
+}
+
+/* Content fade-in-up animation on slide activation
+   --------------------------------------------------------------------------- */
+
+@keyframes wpff-fadein-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes wpff-fadeout-down {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.wpff-slider--content-anim .wpff-slide--active .wpff-slide__heading,
+.wpff-slider--content-anim .wpff-slide--active .wpff-slide__description,
+.wpff-slider--content-anim .wpff-slide--active .wpff-slide__button {
+  animation: wpff-fadein-up 0.55s ease-out 0.2s both;
+}
+
+.wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__heading,
+.wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__description,
+.wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__button {
+  animation: wpff-fadeout-down 0.35s ease-in both;
 }
 
 /* Content overlay

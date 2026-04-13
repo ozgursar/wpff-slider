@@ -46,6 +46,7 @@
       slides: { type: 'array', default: [] },
       objectPosition: { type: 'string', default: 'center center' },
       kenBurns: { type: 'boolean', default: true },
+      contentAnim: { type: 'boolean', default: true },
       slideDuration: { type: 'integer', default: 6 },
       headingTag: { type: 'string', default: 'h2' },
       sliderHeight: { type: 'string', default: '600px' },
@@ -217,6 +218,14 @@
             checked: attributes.kenBurns !== false,
             onChange: function (v) {
               setAttributes({ kenBurns: v })
+            }
+          }),
+
+          el(CheckboxControl, {
+            label: __('Enable Fade In/Out effect', 'wpff-slider'),
+            checked: attributes.contentAnim !== false,
+            onChange: function (v) {
+              setAttributes({ contentAnim: v })
             }
           }),
 

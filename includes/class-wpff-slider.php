@@ -68,7 +68,10 @@ class WPFF_Slider {
 			WPFF_SLIDER_URL . 'assets/js/wpff-slider.min.js',
 			array(),
 			filemtime( WPFF_SLIDER_DIR . 'assets/js/wpff-slider.min.js' ),
-			array( 'strategy' => 'defer', 'in_footer' => false )
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => false,
+			)
 		);
 
 		wp_register_style(
@@ -101,6 +104,10 @@ class WPFF_Slider {
 						'items'   => array( 'type' => 'object' ),
 					),
 					'kenBurns'            => array(
+						'type'    => 'boolean',
+						'default' => true,
+					),
+					'contentAnim'         => array(
 						'type'    => 'boolean',
 						'default' => true,
 					),
@@ -198,6 +205,7 @@ class WPFF_Slider {
 		$slider_height_mobile = sanitize_text_field( $attributes['sliderHeightMobile'] ?? '' );
 		$slide_duration       = absint( $attributes['slideDuration'] ?? 6 );
 		$ken_burns            = (bool) ( $attributes['kenBurns'] ?? true );
+		$content_anim         = (bool) ( $attributes['contentAnim'] ?? true );
 		$content_position     = sanitize_text_field( $attributes['contentPosition'] ?? 'bottom center' );
 		$text_shadow          = (bool) ( $attributes['textShadow'] ?? true );
 		$overlay_gradient     = (bool) ( $attributes['overlayGradient'] ?? true );
@@ -303,8 +311,11 @@ class WPFF_Slider {
 			$style .= '--wpff-desc-color:' . $desc_color . ';';
 		}
 
+		$slider_classes = 'wpff-slider' . ( $content_anim ? ' wpff-slider--content-anim' : '' );
+
 		$html = sprintf(
-			'<div class="wpff-slider" role="region" aria-roledescription="%s" aria-label="%s" style="%s" data-slide-duration="%d" data-object-position="%s">',
+			'<div class="%s" role="region" aria-roledescription="%s" aria-label="%s" style="%s" data-slide-duration="%d" data-object-position="%s">',
+			esc_attr( $slider_classes ),
 			esc_attr__( 'carousel', 'wpff-slider' ),
 			esc_attr__( 'Image slider', 'wpff-slider' ),
 			esc_attr( $style ),
@@ -388,15 +399,15 @@ class WPFF_Slider {
 			: 'full';
 		$link_text           = sanitize_text_field( $slide['linkText'] ?? '' );
 
-		$use_full_link = $link_url && $link_style === 'full';
-		$use_button    = $link_url && $link_style === 'button';
+		$use_full_link = $link_url && 'full' === $link_style;
+		$use_button    = $link_url && 'button' === $link_style;
 		$target        = $link_new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
 
 		$html       = '';
 		$heading_id = ! empty( $heading ) ? wp_unique_id( 'wpff-heading-' ) : '';
 
-		$aria_hidden  = $is_first ? 'false' : 'true';
-		$inert_attr   = $is_first ? '' : ' inert';
+		$aria_hidden = $is_first ? 'false' : 'true';
+		$inert_attr  = $is_first ? '' : ' inert';
 
 		// Use <a> as the slide wrapper when full-slide link is selected.
 		if ( $use_full_link ) {
@@ -479,7 +490,7 @@ class WPFF_Slider {
 					/* translators: appended to button label when link opens in a new tab */
 					? '<span class="wpff-sr-only">' . esc_html__( ', opens in new tab', 'wpff-slider' ) . '</span>'
 					: '';
-				$html          .= sprintf(
+				$html .= sprintf(
 					'<a class="wpff-slide__button" href="%s"%s>%s%s</a>',
 					$link_url,
 					$target,
