@@ -380,17 +380,26 @@ class WPFF_Slider {
 		$link_url     = esc_url( $slide['linkUrl'] ?? '' );
 		$link_new_tab = ! empty( $slide['linkNewTab'] );
 
+		$allowed_link_styles = array( 'full', 'button' );
+		$link_style          = in_array( $slide['linkStyle'] ?? 'full', $allowed_link_styles, true )
+			? ( $slide['linkStyle'] ?? 'full' )
+			: 'full';
+		$link_text           = sanitize_text_field( $slide['linkText'] ?? '' );
+
+		$use_full_link = $link_url && $link_style === 'full';
+		$use_button    = $link_url && $link_style === 'button';
+		$target        = $link_new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
+
 		$html       = '';
 		$heading_id = ! empty( $heading ) ? wp_unique_id( 'wpff-heading-' ) : '';
 
-		// Use <a> as the slide wrapper when a link is present so the whole slide is clickable.
-		if ( $link_url ) {
-			$aria = $heading_id
+		// Use <a> as the slide wrapper when full-slide link is selected.
+		if ( $use_full_link ) {
+			$aria  = $heading_id
 				? sprintf( 'aria-labelledby="%s"', esc_attr( $heading_id ) )
 					/* translators: %d: slide number */
 				: sprintf( 'aria-label="%s"', esc_attr( sprintf( __( 'Slide %d', 'wpff-slider' ), $i + 1 ) ) );
-			$target = $link_new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
-			$html  .= sprintf(
+			$html .= sprintf(
 				'<a class="%s" href="%s" %s%s>',
 				esc_attr( $slide_cls ),
 				$link_url,
@@ -429,11 +438,12 @@ class WPFF_Slider {
 			);
 		$html .= '</div>';
 
-		// Content overlay — heading and description only.
-		if ( $heading || $desc ) {
+		// Content overlay — heading, description, and optional button.
+		if ( $heading || $desc || $use_button ) {
 			$content_cls = 'wpff-slide__content'
 			. ( $block_settings['text_shadow'] ? '' : ' wpff-slide__content--no-shadow' )
-			. ( $block_settings['overlay_gradient'] ? '' : ' wpff-slide__content--no-gradient' );
+			. ( $block_settings['overlay_gradient'] ? '' : ' wpff-slide__content--no-gradient' )
+			. ( $use_button ? ' wpff-slide__content--has-button' : '' );
 			$html       .= sprintf( '<div class="%s">', esc_attr( $content_cls ) );
 
 			if ( $heading ) {
@@ -449,11 +459,20 @@ class WPFF_Slider {
 					. wpautop( wp_kses( $desc, array() ) )
 					. '</div>';
 			}
+			if ( $use_button ) {
+				$btn_label = $link_text ? esc_html( $link_text ) : esc_html__( 'Learn More', 'wpff-slider' );
+				$html     .= sprintf(
+					'<a class="wpff-slide__button" href="%s"%s>%s</a>',
+					$link_url,
+					$target,
+					$btn_label
+				);
+			}
 
 			$html .= '</div>';
 		}
 
-		$html .= $link_url ? '</a>' : '</div>'; // .wpff-slide
+		$html .= $use_full_link ? '</a>' : '</div>'; // .wpff-slide
 
 		return $html;
 	}

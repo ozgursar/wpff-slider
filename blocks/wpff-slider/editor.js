@@ -17,6 +17,7 @@
   const TextControl = wp.components.TextControl
   const TextareaControl = wp.components.TextareaControl
   const CheckboxControl = wp.components.CheckboxControl
+  const RadioControl = wp.components.RadioControl
   const Button = wp.components.Button
   const Placeholder = wp.components.Placeholder
   const BaseControl = wp.components.BaseControl
@@ -79,7 +80,9 @@
               heading: '',
               description: '',
               linkUrl: '',
-              linkNewTab: false
+              linkNewTab: false,
+              linkStyle: 'full',
+              linkText: ''
             }
           ])
         })
@@ -430,13 +433,38 @@
             }
           }),
 
-          // Open in new tab — only shown when a URL is present
+          // Open in new tab, link style, button text — only shown when a URL is present
           slide.linkUrl
             ? el(CheckboxControl, {
                 label: __('Open in new tab', 'wpff-slider'),
                 checked: !!slide.linkNewTab,
                 onChange: function (v) {
                   updateSlide(idx, 'linkNewTab', v)
+                }
+              })
+            : null,
+
+          slide.linkUrl
+            ? el(RadioControl, {
+                label: __('Link style', 'wpff-slider'),
+                selected: slide.linkStyle || 'full',
+                options: [
+                  { label: __('Full slide clickable', 'wpff-slider'), value: 'full' },
+                  { label: __('Button', 'wpff-slider'), value: 'button' }
+                ],
+                onChange: function (v) {
+                  updateSlide(idx, 'linkStyle', v)
+                }
+              })
+            : null,
+
+          slide.linkUrl && slide.linkStyle === 'button'
+            ? el(TextControl, {
+                label: __('Button text', 'wpff-slider'),
+                value: slide.linkText || '',
+                placeholder: __('Learn More', 'wpff-slider'),
+                onChange: function (v) {
+                  updateSlide(idx, 'linkText', v)
                 }
               })
             : null
