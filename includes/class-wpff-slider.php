@@ -137,7 +137,7 @@ class WPFF_Slider {
 			WPFF_SLIDER_URL . 'assets/js/wpff-slider.js',
 			array(),
 			filemtime( WPFF_SLIDER_DIR . 'assets/js/wpff-slider.js' ),
-			true
+			array( 'strategy' => 'defer', 'in_footer' => false )
 		);
 	}
 
@@ -175,7 +175,7 @@ class WPFF_Slider {
 			WPFF_SLIDER_URL . 'assets/js/wpff-slider.js',
 			array(),
 			filemtime( WPFF_SLIDER_DIR . 'assets/js/wpff-slider.js' ),
-			true
+			array( 'strategy' => 'defer', 'in_footer' => false )
 		);
 
 		return $this->build_html( $attributes, $slides );
