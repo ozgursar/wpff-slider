@@ -90,6 +90,10 @@
             goToSlide((currentIndex + 1) % slides.length);
         }
 
+        function goToPrev() {
+            goToSlide((currentIndex - 1 + slides.length) % slides.length);
+        }
+
         /* ---- auto-play ---- */
 
         function startTimer() {
@@ -119,6 +123,43 @@
 
         sliderEl.addEventListener('mouseenter', stopTimer);
         sliderEl.addEventListener('mouseleave', startTimer);
+
+        /* ---- touch swipe ---- */
+
+        if (slides.length > 1) {
+            let touchStartX = 0;
+
+            sliderEl.addEventListener('touchstart', function (e) {
+                touchStartX = e.touches[0].clientX;
+            }, { passive: true });
+
+            sliderEl.addEventListener('touchend', function (e) {
+                const delta = e.changedTouches[0].clientX - touchStartX;
+                if (Math.abs(delta) < 50) return;
+                e.preventDefault();
+                stopTimer();
+                if (delta < 0) advance(); else goToPrev();
+                startTimer();
+            });
+        }
+
+        /* ---- keyboard navigation ---- */
+
+        if (slides.length > 1) {
+            window.addEventListener('keydown', function (e) {
+                const active = document.activeElement;
+                if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
+                if (e.key === 'ArrowLeft') {
+                    stopTimer();
+                    goToPrev();
+                    startTimer();
+                } else if (e.key === 'ArrowRight') {
+                    stopTimer();
+                    advance();
+                    startTimer();
+                }
+            });
+        }
 
         /* ---- kick off ---- */
 

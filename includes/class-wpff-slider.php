@@ -43,48 +43,48 @@ class WPFF_Slider {
 			array(
 				'render_callback' => array( $this, 'render_block' ),
 				'attributes'      => array(
-					'slides'             => array(
+					'slides'              => array(
 						'type'    => 'array',
 						'default' => array(),
 						'items'   => array( 'type' => 'object' ),
 					),
-					'kenBurns'           => array(
+					'kenBurns'            => array(
 						'type'    => 'boolean',
 						'default' => true,
 					),
-					'objectPosition'     => array(
+					'objectPosition'      => array(
 						'type'    => 'string',
 						'default' => 'center center',
 					),
-					'slideDuration'      => array(
+					'slideDuration'       => array(
 						'type'    => 'integer',
 						'default' => 6,
 					),
-					'headingTag'         => array(
+					'headingTag'          => array(
 						'type'    => 'string',
 						'default' => 'h2',
 					),
-					'sliderHeight'       => array(
+					'sliderHeight'        => array(
 						'type'    => 'string',
 						'default' => '600px',
 					),
-					'sliderHeightMobile' => array(
+					'sliderHeightMobile'  => array(
 						'type'    => 'string',
 						'default' => '',
 					),
-					'contentPosition'    => array(
+					'contentPosition'     => array(
 						'type'    => 'string',
 						'default' => 'bottom center',
 					),
-					'textShadow'         => array(
+					'textShadow'          => array(
 						'type'    => 'boolean',
 						'default' => true,
 					),
-					'overlayGradient'    => array(
+					'overlayGradient'     => array(
 						'type'    => 'boolean',
 						'default' => true,
 					),
-					'headingFontSize'    => array(
+					'headingFontSize'     => array(
 						'type'    => 'string',
 						'default' => '2.5rem',
 					),
@@ -92,11 +92,11 @@ class WPFF_Slider {
 						'type'    => 'string',
 						'default' => '1rem',
 					),
-					'headingColor'       => array(
+					'headingColor'        => array(
 						'type'    => 'string',
 						'default' => '#ffffff',
 					),
-					'descriptionColor'   => array(
+					'descriptionColor'    => array(
 						'type'    => 'string',
 						'default' => '#ffffff',
 					),
@@ -373,7 +373,7 @@ class WPFF_Slider {
 		$image_id  = absint( $slide['imageId'] ?? 0 );
 		$image_alt = __( 'Slider image', 'wpff-slider' );
 		$meta_alt  = $image_id > 0 ? get_post_meta( $image_id, '_wp_attachment_image_alt', true ) : '';
-		$image_alt = $meta_alt ?: $image_alt;
+		$image_alt = $meta_alt ? $meta_alt : $image_alt;
 
 		$heading      = $slide['heading'] ?? '';
 		$desc         = $slide['description'] ?? '';
@@ -434,7 +434,7 @@ class WPFF_Slider {
 			$content_cls = 'wpff-slide__content'
 			. ( $block_settings['text_shadow'] ? '' : ' wpff-slide__content--no-shadow' )
 			. ( $block_settings['overlay_gradient'] ? '' : ' wpff-slide__content--no-gradient' );
-			$html .= sprintf( '<div class="%s">', esc_attr( $content_cls ) );
+			$html       .= sprintf( '<div class="%s">', esc_attr( $content_cls ) );
 
 			if ( $heading ) {
 				$html .= sprintf(
