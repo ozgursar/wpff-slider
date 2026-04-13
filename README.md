@@ -25,6 +25,37 @@ A WordPress Gutenberg block that renders a full-width image slider with a Ken Bu
 - **Reduced motion** — Ken Burns animations are disabled for users who prefer reduced motion
 - **Accessibility** — slider is a labelled carousel region; non-active slides are hidden from assistive technologies via `aria-hidden` and `inert`; dot buttons use `aria-pressed`; links that open in a new tab announce this to screen readers
 
+## Development
+
+The plugin ships minified assets (`*.min.js` / `*.min.css`). Source files are kept alongside them for editing. [Node.js](https://nodejs.org/) is required to rebuild.
+
+**Install dependencies** (once):
+
+```bash
+npm install
+```
+
+**Watch mode** — rebuilds minified files automatically whenever a source file is saved:
+
+```bash
+npm run watch
+```
+
+**One-off build** — use before committing or releasing:
+
+```bash
+npm run build
+```
+
+The following source → output pairs are processed:
+
+| Source                              | Output                                  |
+| ----------------------------------- | --------------------------------------- |
+| `assets/js/wpff-slider.js`          | `assets/js/wpff-slider.min.js`          |
+| `blocks/wpff-slider/editor.js`      | `blocks/wpff-slider/editor.min.js`      |
+| `assets/css/wpff-slider.css`        | `assets/css/wpff-slider.min.css`        |
+| `assets/css/wpff-slider-editor.css` | `assets/css/wpff-slider-editor.min.css` |
+
 ## Requirements
 
 |           |                                                      |

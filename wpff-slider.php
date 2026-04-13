@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Fix Fast Slider
  * Description: Full-width image slider block with Ken Burns pan-and-zoom effect, configurable slide duration, content positioning, text shadow, overlay gradient, and per-slide heading, description, and link controls.
- * Version:     1.0.3
+ * Version:     1.0.4
  * Author:      Ozgur Sar
  * Author URI:  https://wpfixfast.com/
  * Plugin URI:  https://wpfixfast.com/
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WPFF_SLIDER_VERSION', '1.0.3' );
+define( 'WPFF_SLIDER_VERSION', '1.0.4' );
 define( 'WPFF_SLIDER_FILE', __FILE__ );
 define( 'WPFF_SLIDER_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WPFF_SLIDER_URL', plugin_dir_url( __FILE__ ) );

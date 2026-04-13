@@ -58,31 +58,31 @@ class WPFF_Slider {
 
 		wp_register_style(
 			'wpff-slider',
-			WPFF_SLIDER_URL . 'assets/css/wpff-slider.css',
+			WPFF_SLIDER_URL . 'assets/css/wpff-slider.min.css',
 			array(),
-			filemtime( WPFF_SLIDER_DIR . 'assets/css/wpff-slider.css' )
+			filemtime( WPFF_SLIDER_DIR . 'assets/css/wpff-slider.min.css' )
 		);
 
 		wp_register_script(
 			'wpff-slider',
-			WPFF_SLIDER_URL . 'assets/js/wpff-slider.js',
+			WPFF_SLIDER_URL . 'assets/js/wpff-slider.min.js',
 			array(),
-			filemtime( WPFF_SLIDER_DIR . 'assets/js/wpff-slider.js' ),
+			filemtime( WPFF_SLIDER_DIR . 'assets/js/wpff-slider.min.js' ),
 			array( 'strategy' => 'defer', 'in_footer' => false )
 		);
 
 		wp_register_style(
 			'wpff-slider-editor',
-			WPFF_SLIDER_URL . 'assets/css/wpff-slider-editor.css',
+			WPFF_SLIDER_URL . 'assets/css/wpff-slider-editor.min.css',
 			array(),
-			filemtime( WPFF_SLIDER_DIR . 'assets/css/wpff-slider-editor.css' )
+			filemtime( WPFF_SLIDER_DIR . 'assets/css/wpff-slider-editor.min.css' )
 		);
 
 		wp_register_script(
 			'wpff-slider-editor',
-			WPFF_SLIDER_URL . 'blocks/wpff-slider/editor.js',
+			WPFF_SLIDER_URL . 'blocks/wpff-slider/editor.min.js',
 			array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n', 'wp-server-side-render', 'wp-data' ),
-			filemtime( WPFF_SLIDER_DIR . 'blocks/wpff-slider/editor.js' ),
+			filemtime( WPFF_SLIDER_DIR . 'blocks/wpff-slider/editor.min.js' ),
 			true
 		);
 
