@@ -30,18 +30,70 @@ class WPFF_Slider {
 
 	private function register_hooks(): void {
 		add_action( 'init', array( $this, 'register_block' ) );
-		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
+		add_shortcode( 'wpff_slider', array( $this, 'render_shortcode' ) );
 	}
 
 	// -------------------------------------------------------------------------
-	// Block registration
+	// Shortcode — [wpff_slider id="123"]
+	// -------------------------------------------------------------------------
+
+	public function render_shortcode( array $atts ): string {
+		$atts = shortcode_atts( array( 'id' => 0 ), $atts, 'wpff_slider' );
+		$post = get_post( absint( $atts['id'] ) );
+
+		if ( ! $post || 'wp_block' !== $post->post_type ) {
+			return '';
+		}
+
+		return do_blocks( $post->post_content );
+	}
+
+	// -------------------------------------------------------------------------
+	// Block registration — also registers all asset handles so WordPress can
+	// inject them into the correct contexts (post editor, site editor iframe,
+	// and frontend) automatically via the block registration fields.
 	// -------------------------------------------------------------------------
 
 	public function register_block(): void {
+
+		wp_register_style(
+			'wpff-slider',
+			WPFF_SLIDER_URL . 'assets/css/wpff-slider.css',
+			array(),
+			filemtime( WPFF_SLIDER_DIR . 'assets/css/wpff-slider.css' )
+		);
+
+		wp_register_script(
+			'wpff-slider',
+			WPFF_SLIDER_URL . 'assets/js/wpff-slider.js',
+			array(),
+			filemtime( WPFF_SLIDER_DIR . 'assets/js/wpff-slider.js' ),
+			array( 'strategy' => 'defer', 'in_footer' => false )
+		);
+
+		wp_register_style(
+			'wpff-slider-editor',
+			WPFF_SLIDER_URL . 'assets/css/wpff-slider-editor.css',
+			array(),
+			filemtime( WPFF_SLIDER_DIR . 'assets/css/wpff-slider-editor.css' )
+		);
+
+		wp_register_script(
+			'wpff-slider-editor',
+			WPFF_SLIDER_URL . 'blocks/wpff-slider/editor.js',
+			array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n', 'wp-server-side-render', 'wp-data' ),
+			filemtime( WPFF_SLIDER_DIR . 'blocks/wpff-slider/editor.js' ),
+			true
+		);
+
 		register_block_type(
 			'wpff-slider/slider',
 			array(
 				'render_callback' => array( $this, 'render_block' ),
+				'editor_script'   => 'wpff-slider-editor',
+				'editor_style'    => 'wpff-slider-editor',
+				'style'           => 'wpff-slider',
+				'script'          => 'wpff-slider',
 				'attributes'      => array(
 					'slides'              => array(
 						'type'    => 'array',
@@ -106,44 +158,7 @@ class WPFF_Slider {
 	}
 
 	// -------------------------------------------------------------------------
-	// Block editor assets (only inside the editor)
-	// -------------------------------------------------------------------------
-
-	public function enqueue_block_editor_assets(): void {
-		wp_enqueue_script(
-			'wpff-slider-editor',
-			WPFF_SLIDER_URL . 'blocks/wpff-slider/editor.js',
-			array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n', 'wp-server-side-render' ),
-			filemtime( WPFF_SLIDER_DIR . 'blocks/wpff-slider/editor.js' ),
-			true
-		);
-
-		wp_enqueue_style(
-			'wpff-slider-editor',
-			WPFF_SLIDER_URL . 'assets/css/wpff-slider-editor.css',
-			array(),
-			filemtime( WPFF_SLIDER_DIR . 'assets/css/wpff-slider-editor.css' )
-		);
-
-		// Frontend assets so the ServerSideRender preview looks and behaves like the frontend.
-		wp_enqueue_style(
-			'wpff-slider',
-			WPFF_SLIDER_URL . 'assets/css/wpff-slider.css',
-			array(),
-			filemtime( WPFF_SLIDER_DIR . 'assets/css/wpff-slider.css' )
-		);
-		wp_enqueue_script(
-			'wpff-slider',
-			WPFF_SLIDER_URL . 'assets/js/wpff-slider.js',
-			array(),
-			filemtime( WPFF_SLIDER_DIR . 'assets/js/wpff-slider.js' ),
-			array( 'strategy' => 'defer', 'in_footer' => false )
-		);
-	}
-
-	// -------------------------------------------------------------------------
 	// Server-side render callback
-	// Frontend assets are enqueued here so they load only when the block is used.
 	// -------------------------------------------------------------------------
 
 	public function render_block( array $attributes ): string {
@@ -162,21 +177,6 @@ class WPFF_Slider {
 		if ( empty( $slides ) ) {
 			return '';
 		}
-
-		// Enqueue frontend assets — WordPress deduplicates by handle.
-		wp_enqueue_style(
-			'wpff-slider',
-			WPFF_SLIDER_URL . 'assets/css/wpff-slider.css',
-			array(),
-			filemtime( WPFF_SLIDER_DIR . 'assets/css/wpff-slider.css' )
-		);
-		wp_enqueue_script(
-			'wpff-slider',
-			WPFF_SLIDER_URL . 'assets/js/wpff-slider.js',
-			array(),
-			filemtime( WPFF_SLIDER_DIR . 'assets/js/wpff-slider.js' ),
-			array( 'strategy' => 'defer', 'in_footer' => false )
-		);
 
 		return $this->build_html( $attributes, $slides );
 	}

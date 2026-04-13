@@ -25,6 +25,7 @@
   const ColorPalette = wp.components.ColorPalette
   const FontSizePicker = wp.blockEditor.FontSizePicker
   const ServerSideRender = wp.serverSideRender
+  const useSelect = wp.data.useSelect
 
   function uid() {
     return Math.random().toString(36).slice(2, 9)
@@ -67,6 +68,13 @@
       const setAttributes = props.setAttributes
       const slides = attributes.slides || []
       const blockProps = useBlockProps({ className: 'wpff-slider-editor-wrap' })
+
+      const { postId, postType } = useSelect(function (select) {
+        return {
+          postId:   select('core/editor').getCurrentPostId(),
+          postType: select('core/editor').getCurrentPostType()
+        }
+      })
 
       /* ---- slide mutation helpers ---- */
 
@@ -309,6 +317,25 @@
             })
           )
 
+        ),
+
+        el(
+          PanelBody,
+          { title: __('Shortcode', 'wpff-slider'), initialOpen: true },
+          postType === 'wp_block'
+            ? el(
+                'div',
+                { className: 'wpff-shortcode-panel' },
+                el('p', { className: 'wpff-shortcode-panel__help' },
+                  __('Use this shortcode to embed the slider in Elementor, WPBakery, or any other page builder:', 'wpff-slider')
+                ),
+                el('code', { className: 'wpff-shortcode-panel__code' },
+                  '[wpff_slider id="' + postId + '"]'
+                )
+              )
+            : el('p', { className: 'wpff-shortcode-panel__help' },
+                __('Save this block as a Synced Pattern to get a shortcode you can use in other page builders.', 'wpff-slider')
+              )
         )
       )
 

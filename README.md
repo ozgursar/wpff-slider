@@ -8,7 +8,9 @@ A WordPress Gutenberg block that renders a full-width image slider with a Ken Bu
 - **Cross-fade transitions** — smooth opacity-based slide transitions with configurable duration (3–20 seconds per slide)
 - **Navigation dots** — accessible dot navigation with hover and focus styles; hidden when only one slide is present
 - **Hover pause** — auto-play pauses when the user hovers over the slider
-- **Per-slide controls** — each slide has its own image, heading, description, link URL, and "open in new tab" option
+- **Touch swipe** — swipe left or right on touch devices to navigate slides; short taps pass through to links normally
+- **Keyboard navigation** — left/right arrow keys navigate slides from anywhere on the page; ignored when typing in a form field
+- **Per-slide link style** — choose between making the full slide clickable or showing a button; button label is configurable
 - **Content position** — 9 positions (top/center/bottom × left/center/right)
 - **Image focus** — top, center, or bottom image cropping anchor
 - **Overlay gradient** — optional darkening gradient over the lower portion of the image (toggle on/off)
@@ -18,9 +20,10 @@ A WordPress Gutenberg block that renders a full-width image slider with a Ken Bu
 - **Configurable colors** — separate color pickers for heading and description text
 - **Responsive height** — set separate slider heights for desktop and mobile
 - **Responsive text alignment** — text is always horizontally centered on mobile regardless of the desktop content position setting
-- **Performance** — first slide image loads eagerly with `fetchpriority="high"`; subsequent slides load lazily. `wp_get_attachment_image()` is used for full srcset/sizes support
+- **Shortcode support** — embed the slider in Elementor, WPBakery, or any page builder via `[wpff_slider id="123"]` using a Synced Pattern
+- **Performance** — first slide image loads eagerly with `fetchpriority="high"`; subsequent slides load lazily. `wp_get_attachment_image()` is used for full srcset/sizes support. Frontend script is deferred in `<head>` for early download without blocking rendering
 - **Reduced motion** — Ken Burns animations are disabled for users who prefer reduced motion
-- **Accessibility** — slide links use `aria-labelledby` or `aria-label`; dot buttons have `aria-current` and `aria-label`
+- **Accessibility** — slider is a labelled carousel region; non-active slides are hidden from assistive technologies via `aria-hidden` and `inert`; dot buttons use `aria-pressed`; links that open in a new tab announce this to screen readers
 
 ## Requirements
 
@@ -40,12 +43,24 @@ A WordPress Gutenberg block that renders a full-width image slider with a Ken Bu
 
 1. Add the **WPFF Slider** block to any post or page
 2. Click **Add First Slide** and select an image from the Media Library
-3. Optionally add a heading, description, and link URL for each slide
+3. Optionally add a heading, description, and link for each slide
 4. Add more slides with the **Add Slide** button
 5. Reorder or remove slides using the arrow and trash buttons on each slide card
 6. Adjust appearance settings in the sidebar panels:
    - **Slider Settings** — height, image focus, content position, heading tag, Ken Burns, text shadow, gradient, slide duration
    - **Text & Colors** — heading size, description size, heading color, description color
+   - **Shortcode** — shows the `[wpff_slider]` shortcode when editing a Synced Pattern
+
+## Using the Slider in Other Page Builders
+
+To embed the slider in Elementor, WPBakery, or any other page builder:
+
+1. Build the slider in the Gutenberg editor
+2. Select the block and save it as a **Synced Pattern** via the block toolbar (⋮ menu → Create pattern → toggle Synced on)
+3. Open the pattern from **Patterns** in the site editor — the **Shortcode** panel in the sidebar shows the ready-to-use shortcode
+4. Paste the shortcode (e.g. `[wpff_slider id="42"]`) into any page builder text/shortcode widget
+
+Changes made to the Synced Pattern are reflected everywhere the shortcode is used.
 
 ## Block Settings Reference
 
@@ -74,19 +89,21 @@ A WordPress Gutenberg block that renders a full-width image slider with a Ken Bu
 
 ### Per-slide fields
 
-| Field           | Description                                        |
-| --------------- | -------------------------------------------------- |
-| Image           | Required. Select or replace from the Media Library |
-| Heading         | Optional slide title                               |
-| Description     | Optional body text. Supports multiple paragraphs   |
-| Link URL        | Makes the entire slide a clickable link            |
-| Open in new tab | Shown only when a link URL is set                  |
+| Field           | Description                                                                           |
+| --------------- | ------------------------------------------------------------------------------------- |
+| Image           | Required. Select or replace from the Media Library                                    |
+| Heading         | Optional slide title                                                                  |
+| Description     | Optional body text. Supports multiple paragraphs                                      |
+| Link URL        | Type a URL or search for a post or page by name                                       |
+| Open in new tab | Shown only when a link URL is set                                                     |
+| Link style      | **Full slide clickable** (default) or **Button** — shown only when a link URL is set  |
+| Button text     | Label for the button. Defaults to "Learn More" if left empty                          |
 
 ## How It Works
 
 The block is **server-side rendered**. Block attributes are saved as JSON in the post content and passed to the PHP `render_callback` on every page load. This means:
 
-- No JavaScript is required to render the initial HTML
+- No JavaScript is required to render the initial HTML — the first slide is fully visible even with JS disabled
 - The editor preview (via `ServerSideRender`) is pixel-identical to the frontend
 - Image markup is generated by `wp_get_attachment_image()`, giving browsers a full `srcset` and `sizes` for responsive loading
 
@@ -95,11 +112,14 @@ The frontend JavaScript (`wpff-slider.js`) is responsible only for:
 - Starting the Ken Burns CSS animation on the active slide
 - Advancing slides on a timer
 - Syncing the dot navigation indicator
-- Handling dot clicks and hover-pause
+- Handling dot clicks, hover pause, touch swipe, and keyboard arrow navigation
+- Managing `aria-hidden` and `inert` attributes on non-active slides during transitions
 
 ### Image loading performance
 
 The first slide image is given `loading="eager"`, `fetchpriority="high"`, and `decoding="sync"` so the browser prioritises it immediately — it is the largest contentful element on the page and should never be lazy-loaded. All subsequent slide images use `loading="lazy"`, `fetchpriority="auto"`, and `decoding="async"` so they are only fetched when needed, keeping the initial page load lean.
+
+The frontend script is enqueued in `<head>` with the `defer` attribute, allowing the browser to discover and download it early while execution still waits until the DOM is ready.
 
 ## License
 

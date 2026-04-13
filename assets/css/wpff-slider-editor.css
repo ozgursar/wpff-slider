@@ -99,6 +99,25 @@
   border-color: #007cba !important;
 }
 
+/* Shortcode panel
+   --------------------------------------------------------------------------- */
+
+.wpff-shortcode-panel__help {
+  font-size: 12px;
+  color: #757575;
+  margin: 0 0 8px;
+}
+
+.wpff-shortcode-panel__code {
+  display: block;
+  padding: 10px 12px;
+  background: #f0f0f1;
+  border-radius: 4px;
+  font-size: 12px;
+  word-break: break-all;
+  user-select: all;
+}
+
 /* Match TextControl input height to URLInput (40px)
    --------------------------------------------------------------------------- */
 
