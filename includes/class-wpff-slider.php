@@ -125,15 +125,15 @@ class WPFF_Slider {
 					),
 					'sliderHeight'        => array(
 						'type'    => 'string',
-						'default' => '600px',
+						'default' => '400px',
 					),
 					'sliderHeightMobile'  => array(
 						'type'    => 'string',
-						'default' => '',
+						'default' => '450px',
 					),
 					'aspectRatio'         => array(
 						'type'    => 'string',
-						'default' => '',
+						'default' => '16 / 6',
 					),
 					'contentPosition'     => array(
 						'type'    => 'string',

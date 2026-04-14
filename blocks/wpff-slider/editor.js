@@ -20,6 +20,7 @@
   const TextareaControl = wp.components.TextareaControl
   const CheckboxControl = wp.components.CheckboxControl
   const RadioControl = wp.components.RadioControl
+  const NumberControl = wp.components.__experimentalNumberControl
   const Button = wp.components.Button
   const Placeholder = wp.components.Placeholder
   const BaseControl = wp.components.BaseControl
@@ -50,9 +51,9 @@
       contentAnim: { type: 'boolean', default: true },
       slideDuration: { type: 'integer', default: 6 },
       headingTag: { type: 'string', default: 'h2' },
-      sliderHeight: { type: 'string', default: '600px' },
-      sliderHeightMobile: { type: 'string', default: '' },
-      aspectRatio: { type: 'string', default: '' },
+      sliderHeight: { type: 'string', default: '400px' },
+      sliderHeightMobile: { type: 'string', default: '450px' },
+      aspectRatio: { type: 'string', default: '16 / 6' },
       contentPosition: { type: 'string', default: 'bottom center' },
       textShadow: { type: 'boolean', default: true },
       overlayGradient: { type: 'boolean', default: true },
@@ -163,12 +164,23 @@
                   className: 'wpff-ratio-card' + (isActive ? ' is-active' : ''),
                   onClick: function () {
                     setAttributes({ aspectRatio: isActive ? '' : p.ratio })
+                    setCustomW(String(p.w))
+                    setCustomH(String(p.h))
                   }
                 },
-                  el('div', {
-                    className: 'wpff-ratio-card__preview',
-                    style: { paddingTop: (p.h / p.w * 100).toFixed(2) + '%' }
-                  }),
+                  el('div', { className: 'wpff-ratio-card__preview' },
+                    el('div', {
+                      className: 'wpff-ratio-card__preview-inner',
+                      style: (function () {
+                        var maxW = 68, maxH = 38
+                        var scale = Math.min(maxW / p.w, maxH / p.h)
+                        return {
+                          width:  Math.round(p.w * scale) + 'px',
+                          height: Math.round(p.h * scale) + 'px'
+                        }
+                      })()
+                    })
+                  ),
                   el('span', { className: 'wpff-ratio-card__ratio' }, p.label),
                   el('span', { className: 'wpff-ratio-card__name' }, p.name)
                 )
@@ -176,25 +188,33 @@
             )
           ),
 
-          el('div', { className: 'wpff-custom-ratio' },
+          el('div', {
+            className: 'wpff-custom-ratio' + (
+              attributes.aspectRatio !== '' && !ratioPresets.some(function (p) { return p.ratio === attributes.aspectRatio })
+                ? ' is-active'
+                : ''
+            )
+          },
             el('p', { className: 'wpff-custom-ratio__label' },
               __('Custom Ratio', 'wpff-slider')
             ),
             el('div', { className: 'wpff-custom-ratio__row' },
-              el(TextControl, {
+              el(NumberControl, {
                 label: __('Width', 'wpff-slider'),
                 hideLabelFromVision: true,
                 value: customW,
                 className: 'wpff-custom-ratio__input',
+                min: 1,
                 onChange: function (v) { setCustomW(v) },
                 __nextHasNoMarginBottom: true
               }),
               el('span', { className: 'wpff-custom-ratio__sep' }, '/'),
-              el(TextControl, {
+              el(NumberControl, {
                 label: __('Height', 'wpff-slider'),
                 hideLabelFromVision: true,
                 value: customH,
                 className: 'wpff-custom-ratio__input',
+                min: 1,
                 onChange: function (v) { setCustomH(v) },
                 __nextHasNoMarginBottom: true
               }),
@@ -297,7 +317,7 @@
           }),
 
           el(CheckboxControl, {
-            label: __('Enable Fade In/Out effect', 'wpff-slider'),
+            label: __('Enable fade in/out effect', 'wpff-slider'),
             checked: attributes.contentAnim !== false,
             onChange: function (v) {
               setAttributes({ contentAnim: v })
