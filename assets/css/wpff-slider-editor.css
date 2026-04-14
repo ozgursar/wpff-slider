@@ -123,6 +123,7 @@
 
 .wpff-slide-card__col .components-text-control__input {
   height: 40px;
+  font-size: inherit !important;
 }
 
 /* URL input field
@@ -169,7 +170,7 @@
 .wpff-ratio-presets {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  gap: 3px;
   margin-top: 8px;
 }
 

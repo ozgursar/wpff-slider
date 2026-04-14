@@ -163,6 +163,10 @@ class WPFF_Slider {
 						'type'    => 'string',
 						'default' => '#ffffff',
 					),
+					'constrainContent'    => array(
+						'type'    => 'boolean',
+						'default' => true,
+					),
 				),
 			)
 		);
@@ -214,6 +218,7 @@ class WPFF_Slider {
 		$content_position     = sanitize_text_field( $attributes['contentPosition'] ?? 'bottom center' );
 		$text_shadow          = (bool) ( $attributes['textShadow'] ?? true );
 		$overlay_gradient     = (bool) ( $attributes['overlayGradient'] ?? true );
+		$constrain_content    = (bool) ( $attributes['constrainContent'] ?? true );
 		$heading_font_size    = sanitize_text_field( $attributes['headingFontSize'] ?? '2.5rem' );
 		$desc_font_size       = sanitize_text_field( $attributes['descriptionFontSize'] ?? '1rem' );
 		$heading_color        = sanitize_text_field( $attributes['headingColor'] ?? '#ffffff' );
@@ -337,13 +342,16 @@ class WPFF_Slider {
 		/* ---- slides ---- */
 
 		$block_settings = array(
-			'heading_tag'      => $heading_tag,
-			'ken_burns'        => $ken_burns,
-			'kb_variants'      => array( 'wpff-kb-1', 'wpff-kb-2', 'wpff-kb-3', 'wpff-kb-4' ),
-			'text_shadow'      => $text_shadow,
-			'object_position'  => $position_css,
-			'overlay_gradient' => $overlay_gradient,
+			'heading_tag'       => $heading_tag,
+			'ken_burns'         => $ken_burns,
+			'kb_variants'       => array( 'wpff-kb-1', 'wpff-kb-2', 'wpff-kb-3', 'wpff-kb-4' ),
+			'text_shadow'       => $text_shadow,
+			'object_position'   => $position_css,
+			'overlay_gradient'  => $overlay_gradient,
+			'constrain_content' => $constrain_content,
+			'content_flex'      => $content_flex,
 		);
+
 
 		$html .= '<div class="wpff-slider__track">';
 
@@ -479,8 +487,14 @@ class WPFF_Slider {
 			$content_cls = 'wpff-slide__content'
 			. ( $block_settings['text_shadow'] ? '' : ' wpff-slide__content--no-shadow' )
 			. ( $block_settings['overlay_gradient'] ? '' : ' wpff-slide__content--no-gradient' )
-			. ( $use_button ? ' wpff-slide__content--has-button' : '' );
+			. ( $use_button ? ' wpff-slide__content--has-button' : '' )
+			. ( $block_settings['constrain_content'] ? ' wpff-slide__content--constrained' : '' );
 			$html       .= sprintf( '<div class="%s">', esc_attr( $content_cls ) );
+			$html       .= sprintf(
+				'<div class="wpff-slide__content-inner" style="--wpff-inner-align:%s;--wpff-inner-text-align:%s;">',
+				esc_attr( $block_settings['content_flex']['align'] ),
+				esc_attr( $block_settings['content_flex']['text'] )
+			);
 
 			if ( $heading ) {
 				$html .= sprintf(
@@ -510,7 +524,8 @@ class WPFF_Slider {
 				);
 			}
 
-			$html .= '</div>';
+			$html .= '</div>'; // .wpff-slide__content-inner
+			$html .= '</div>'; // .wpff-slide__content
 		}
 
 		// When a heading labels the full-slide link and it opens in a new tab,

@@ -206,18 +206,34 @@ a.wpff-slide {
   z-index: 3;
   display: flex;
   flex-direction: column;
-  align-items: var(--wpff-content-align, center);
+  align-items: stretch;
   justify-content: var(--wpff-content-justify, flex-end);
-  padding: 2rem 2rem 3.5rem;
   text-align: var(--wpff-content-text-align, center);
   /* Gradient only over the lower portion to avoid obscuring the full image */
   background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
   pointer-events: none;
+  padding-top: 2rem;
+  padding-bottom: 3.5rem;
+  padding-left: var(--wp--preset--spacing--medium, 2rem);
+  padding-right: var(--wp--preset--spacing--medium, 2rem);
+}
+
+.wpff-slide__content-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: var(--wpff-inner-align, center);
+  text-align: var(--wpff-inner-text-align, center);
+  width: 100%;
+}
+
+.wpff-slide__content--constrained .wpff-slide__content-inner {
+  max-width: var(--wp--style--global--wide-size, 1200px);
+  align-self: center;
 }
 
 .wpff-slide__heading {
   color: var(--wpff-heading-color, #fff);
-  font-size: clamp(1.25rem, 4vw, var(--wpff-heading-size, 2.5rem));
+  font-size: clamp(1.6rem, 4vw, var(--wpff-heading-size, 2.5rem));
   font-weight: 700;
   line-height: 1.2;
   margin: 0 0 0.5rem;
@@ -227,7 +243,7 @@ a.wpff-slide {
 
 .wpff-slide__description {
   color: var(--wpff-desc-color, rgba(255, 255, 255, 0.92));
-  font-size: clamp(0.8125rem, 2vw, var(--wpff-desc-size, 1rem));
+  font-size: clamp(1rem, 2vw, var(--wpff-desc-size, 1rem));
   line-height: 1.55;
   max-width: 55ch;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
@@ -245,9 +261,17 @@ a.wpff-slide {
 /* On mobile, force horizontal centering regardless of the Content Position setting.
    Vertical alignment (justify-content) still follows the user's selection. */
 @media (max-width: 768px) {
-  .wpff-slide__content {
+  .wpff-slide__content,
+  .wpff-slide__content-inner {
     align-items: center;
     text-align: center;
+  }
+
+  .wpff-slide__content-inner,
+  .wpff-slide__content--constrained .wpff-slide__content-inner {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    margin: 0;
   }
 }
 

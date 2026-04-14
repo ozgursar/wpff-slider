@@ -39,7 +39,7 @@
 
   registerBlockType('wpff-slider/slider', {
     title: __('WPFF Slider', 'wpff-slider'),
-    description: __('Full-width image slider with Ken Burns pan-and-zoom effect, configurable content position, text shadow, overlay gradient, and per-slide heading, description, and link controls.', 'wpff-slider'),
+    description: __('Full-width image slider with Ken Burns effect and per-slide content controls.', 'wpff-slider'),
     icon: 'slides',
     category: 'media',
 
@@ -60,7 +60,8 @@
       headingFontSize: { type: 'string', default: '2.5rem' },
       descriptionFontSize: { type: 'string', default: '1rem' },
       headingColor: { type: 'string', default: '#ffffff' },
-      descriptionColor: { type: 'string', default: '#ffffff' }
+      descriptionColor: { type: 'string', default: '#ffffff' },
+      constrainContent: { type: 'boolean', default: true }
     },
 
     // -----------------------------------------------------------------
@@ -75,7 +76,7 @@
 
       const { postId, postType } = useSelect(function (select) {
         return {
-          postId:   select('core/editor').getCurrentPostId(),
+          postId: select('core/editor').getCurrentPostId(),
           postType: select('core/editor').getCurrentPostType()
         }
       })
@@ -85,8 +86,8 @@
         { ratio: '16 / 5', label: '16:5', name: __('Wide hero', 'wpff-slider'), w: 16, h: 5 },
         { ratio: '16 / 6', label: '16:6', name: __('Standard', 'wpff-slider'), w: 16, h: 6 },
         { ratio: '16 / 7', label: '16:7', name: __('Balanced', 'wpff-slider'), w: 16, h: 7 },
-        { ratio: '3 / 1',  label: '3:1',  name: __('Banner', 'wpff-slider'), w: 3, h: 1 },
-        { ratio: '4 / 1',  label: '4:1',  name: __('Slim banner', 'wpff-slider'), w: 4, h: 1 },
+        { ratio: '3 / 1', label: '3:1', name: __('Banner', 'wpff-slider'), w: 3, h: 1 },
+        { ratio: '4 / 1', label: '4:1', name: __('Slim banner', 'wpff-slider'), w: 4, h: 1 }
       ]
       const [customW, setCustomW] = useState('16')
       const [customH, setCustomH] = useState('9')
@@ -150,32 +151,41 @@
           PanelBody,
           { title: __('Slider Settings', 'wpff-slider'), initialOpen: true },
 
-          el(BaseControl, {
-            label: __('Aspect Ratio', 'wpff-slider'),
-            id: 'wpff-aspect-ratio',
-            __nextHasNoMarginBottom: true
-          },
-            el('div', { className: 'wpff-ratio-presets' },
+          el(
+            BaseControl,
+            {
+              label: __('Aspect Ratio', 'wpff-slider'),
+              id: 'wpff-aspect-ratio',
+              __nextHasNoMarginBottom: true
+            },
+            el(
+              'div',
+              { className: 'wpff-ratio-presets' },
               ratioPresets.map(function (p) {
                 var isActive = attributes.aspectRatio === p.ratio
-                return el('button', {
-                  key: p.ratio,
-                  type: 'button',
-                  className: 'wpff-ratio-card' + (isActive ? ' is-active' : ''),
-                  onClick: function () {
-                    setAttributes({ aspectRatio: isActive ? '' : p.ratio })
-                    setCustomW(String(p.w))
-                    setCustomH(String(p.h))
-                  }
-                },
-                  el('div', { className: 'wpff-ratio-card__preview' },
+                return el(
+                  'button',
+                  {
+                    key: p.ratio,
+                    type: 'button',
+                    className: 'wpff-ratio-card' + (isActive ? ' is-active' : ''),
+                    onClick: function () {
+                      setAttributes({ aspectRatio: isActive ? '' : p.ratio })
+                      setCustomW(String(p.w))
+                      setCustomH(String(p.h))
+                    }
+                  },
+                  el(
+                    'div',
+                    { className: 'wpff-ratio-card__preview' },
                     el('div', {
                       className: 'wpff-ratio-card__preview-inner',
                       style: (function () {
-                        var maxW = 68, maxH = 38
+                        var maxW = 68,
+                          maxH = 38
                         var scale = Math.min(maxW / p.w, maxH / p.h)
                         return {
-                          width:  Math.round(p.w * scale) + 'px',
+                          width: Math.round(p.w * scale) + 'px',
                           height: Math.round(p.h * scale) + 'px'
                         }
                       })()
@@ -188,24 +198,31 @@
             )
           ),
 
-          el('div', {
-            className: 'wpff-custom-ratio' + (
-              attributes.aspectRatio !== '' && !ratioPresets.some(function (p) { return p.ratio === attributes.aspectRatio })
-                ? ' is-active'
-                : ''
-            )
-          },
-            el('p', { className: 'wpff-custom-ratio__label' },
-              __('Custom Ratio', 'wpff-slider')
-            ),
-            el('div', { className: 'wpff-custom-ratio__row' },
+          el(
+            'div',
+            {
+              className:
+                'wpff-custom-ratio' +
+                (attributes.aspectRatio !== '' &&
+                !ratioPresets.some(function (p) {
+                  return p.ratio === attributes.aspectRatio
+                })
+                  ? ' is-active'
+                  : '')
+            },
+            el('p', { className: 'wpff-custom-ratio__label' }, __('Custom Ratio', 'wpff-slider')),
+            el(
+              'div',
+              { className: 'wpff-custom-ratio__row' },
               el(NumberControl, {
                 label: __('Width', 'wpff-slider'),
                 hideLabelFromVision: true,
                 value: customW,
                 className: 'wpff-custom-ratio__input',
                 min: 1,
-                onChange: function (v) { setCustomW(v) },
+                onChange: function (v) {
+                  setCustomW(v)
+                },
                 __nextHasNoMarginBottom: true
               }),
               el('span', { className: 'wpff-custom-ratio__sep' }, '/'),
@@ -215,19 +232,25 @@
                 value: customH,
                 className: 'wpff-custom-ratio__input',
                 min: 1,
-                onChange: function (v) { setCustomH(v) },
+                onChange: function (v) {
+                  setCustomH(v)
+                },
                 __nextHasNoMarginBottom: true
               }),
-              el(Button, {
-                variant: 'secondary',
-                onClick: function () {
-                  var w = parseFloat(customW)
-                  var h = parseFloat(customH)
-                  if (w > 0 && h > 0) {
-                    setAttributes({ aspectRatio: w + ' / ' + h })
+              el(
+                Button,
+                {
+                  variant: 'secondary',
+                  onClick: function () {
+                    var w = parseFloat(customW)
+                    var h = parseFloat(customH)
+                    if (w > 0 && h > 0) {
+                      setAttributes({ aspectRatio: w + ' / ' + h })
+                    }
                   }
-                }
-              }, __('Apply', 'wpff-slider'))
+                },
+                __('Apply', 'wpff-slider')
+              )
             )
           ),
 
@@ -262,7 +285,7 @@
             label: __('Image Focus', 'wpff-slider'),
             value: attributes.objectPosition,
             options: [
-              { value: 'top center',    label: __('Top',    'wpff-slider') },
+              { value: 'top center', label: __('Top', 'wpff-slider') },
               { value: 'center center', label: __('Center', 'wpff-slider') },
               { value: 'bottom center', label: __('Bottom', 'wpff-slider') }
             ],
@@ -275,15 +298,15 @@
             label: __('Content Position', 'wpff-slider'),
             value: attributes.contentPosition,
             options: [
-              { value: 'top left',      label: __('Top Left',      'wpff-slider') },
-              { value: 'top center',    label: __('Top Center',    'wpff-slider') },
-              { value: 'top right',     label: __('Top Right',     'wpff-slider') },
-              { value: 'center left',   label: __('Center Left',   'wpff-slider') },
-              { value: 'center center', label: __('Center',        'wpff-slider') },
-              { value: 'center right',  label: __('Center Right',  'wpff-slider') },
-              { value: 'bottom left',   label: __('Bottom Left',   'wpff-slider') },
+              { value: 'top left', label: __('Top Left', 'wpff-slider') },
+              { value: 'top center', label: __('Top Center', 'wpff-slider') },
+              { value: 'top right', label: __('Top Right', 'wpff-slider') },
+              { value: 'center left', label: __('Center Left', 'wpff-slider') },
+              { value: 'center center', label: __('Center', 'wpff-slider') },
+              { value: 'center right', label: __('Center Right', 'wpff-slider') },
+              { value: 'bottom left', label: __('Bottom Left', 'wpff-slider') },
               { value: 'bottom center', label: __('Bottom Center', 'wpff-slider') },
-              { value: 'bottom right',  label: __('Bottom Right',  'wpff-slider') }
+              { value: 'bottom right', label: __('Bottom Right', 'wpff-slider') }
             ],
             onChange: function (v) {
               setAttributes({ contentPosition: v })
@@ -340,6 +363,15 @@
             }
           }),
 
+          el(CheckboxControl, {
+            label: __('Constrain content width', 'wpff-slider'),
+            help: __("Limits content to the theme's wide width (falls back to 1200px).", 'wpff-slider'),
+            checked: attributes.constrainContent !== false,
+            onChange: function (v) {
+              setAttributes({ constrainContent: v })
+            }
+          }),
+
           el(RangeControl, {
             label: __('Slide Duration (s)', 'wpff-slider'),
             help: __('How long each slide is displayed.', 'wpff-slider'),
@@ -349,23 +381,24 @@
             onChange: function (v) {
               setAttributes({ slideDuration: v })
             }
-          }),
-
+          })
         ),
 
         el(
           PanelBody,
           { title: __('Text & Colors', 'wpff-slider'), initialOpen: false },
 
-          el(BaseControl, {
-            label: __('Heading size', 'wpff-slider'),
-            __nextHasNoMarginBottom: true
-          },
+          el(
+            BaseControl,
+            {
+              label: __('Heading size', 'wpff-slider'),
+              __nextHasNoMarginBottom: true
+            },
             el(FontSizePicker, {
               fontSizes: [
-                { name: 'S',  slug: 's',  size: '1.5rem' },
-                { name: 'M',  slug: 'm',  size: '2rem'   },
-                { name: 'L',  slug: 'l',  size: '2.5rem' },
+                { name: 'S', slug: 's', size: '1.5rem' },
+                { name: 'M', slug: 'm', size: '2rem' },
+                { name: 'L', slug: 'l', size: '2.5rem' },
                 { name: 'XL', slug: 'xl', size: '3.5rem' }
               ],
               value: attributes.headingFontSize,
@@ -377,16 +410,18 @@
             })
           ),
 
-          el(BaseControl, {
-            label: __('Description size', 'wpff-slider'),
-            __nextHasNoMarginBottom: true
-          },
+          el(
+            BaseControl,
+            {
+              label: __('Description size', 'wpff-slider'),
+              __nextHasNoMarginBottom: true
+            },
             el(FontSizePicker, {
               fontSizes: [
-                { name: 'S',  slug: 's',  size: '0.875rem' },
-                { name: 'M',  slug: 'm',  size: '1rem'     },
-                { name: 'L',  slug: 'l',  size: '1.25rem'  },
-                { name: 'XL', slug: 'xl', size: '1.5rem'   }
+                { name: 'S', slug: 's', size: '0.875rem' },
+                { name: 'M', slug: 'm', size: '1rem' },
+                { name: 'L', slug: 'l', size: '1.25rem' },
+                { name: 'XL', slug: 'xl', size: '1.5rem' }
               ],
               value: attributes.descriptionFontSize,
               onChange: function (v) {
@@ -397,10 +432,12 @@
             })
           ),
 
-          el(BaseControl, {
-            label: __('Heading color', 'wpff-slider'),
-            __nextHasNoMarginBottom: true
-          },
+          el(
+            BaseControl,
+            {
+              label: __('Heading color', 'wpff-slider'),
+              __nextHasNoMarginBottom: true
+            },
             el(ColorPalette, {
               value: attributes.headingColor,
               onChange: function (v) {
@@ -409,10 +446,12 @@
             })
           ),
 
-          el(BaseControl, {
-            label: __('Description color', 'wpff-slider'),
-            __nextHasNoMarginBottom: true
-          },
+          el(
+            BaseControl,
+            {
+              label: __('Description color', 'wpff-slider'),
+              __nextHasNoMarginBottom: true
+            },
             el(ColorPalette, {
               value: attributes.descriptionColor,
               onChange: function (v) {
@@ -420,25 +459,32 @@
               }
             })
           )
-
         ),
 
         el(
           PanelBody,
-          { title: __('Shortcode', 'wpff-slider'), initialOpen: true },
+          { title: __('Shortcode', 'wpff-slider'), initialOpen: false },
           postType === 'wp_block'
             ? el(
                 'div',
                 { className: 'wpff-shortcode-panel' },
-                el('p', { className: 'wpff-shortcode-panel__help' },
-                  __('Use this shortcode to embed the slider in Elementor, WPBakery, or any other page builder:', 'wpff-slider')
+                el(
+                  'p',
+                  { className: 'wpff-shortcode-panel__help' },
+                  __(
+                    'Use this shortcode to embed the slider in Elementor, WPBakery, or any other page builder:',
+                    'wpff-slider'
+                  )
                 ),
-                el('code', { className: 'wpff-shortcode-panel__code' },
-                  '[wpff_slider id="' + postId + '"]'
-                )
+                el('code', { className: 'wpff-shortcode-panel__code' }, '[wpff_slider id="' + postId + '"]')
               )
-            : el('p', { className: 'wpff-shortcode-panel__help' },
-                __('Save this block as a Synced Pattern to get a shortcode you can use in other page builders.', 'wpff-slider')
+            : el(
+                'p',
+                { className: 'wpff-shortcode-panel__help' },
+                __(
+                  'Save this block as a Synced Pattern to get a shortcode you can use in other page builders.',
+                  'wpff-slider'
+                )
               )
         )
       )
@@ -493,50 +539,54 @@
             MediaUploadCheck,
             null,
             el(MediaUpload, {
-                  onSelect: function (media) {
-                    setAttributes({
-                      slides: slides.map(function (s, i) {
-                        if (i !== idx) return s
-                        return Object.assign({}, s, {
-                          imageId: media.id,
-                          imageUrl: media.url,
-                          imageAlt: media.alt || __('Slider image', 'wpff-slider')
-                        })
-                      })
+              onSelect: function (media) {
+                setAttributes({
+                  slides: slides.map(function (s, i) {
+                    if (i !== idx) return s
+                    return Object.assign({}, s, {
+                      imageId: media.id,
+                      imageUrl: media.url,
+                      imageAlt: media.alt || __('Slider image', 'wpff-slider')
                     })
-                  },
-                  allowedTypes: ['image'],
-                  value: slide.imageId || 0,
-                  render: function (ref) {
-                    if (slide.imageUrl) {
-                      return el(
-                        'div',
-                        { className: 'wpff-slide-card__thumb-wrap' },
-                        el('img', {
-                          src: slide.imageUrl,
-                          alt: slide.imageAlt,
-                          className: 'wpff-slide-card__thumb'
-                        }),
-                        el(Button, {
-                          variant: 'secondary',
-                          isSmall: true,
-                          onClick: ref.open
-                        }, __('Replace image', 'wpff-slider'))
-                      )
-                    }
-                    return el(
+                  })
+                })
+              },
+              allowedTypes: ['image'],
+              value: slide.imageId || 0,
+              render: function (ref) {
+                if (slide.imageUrl) {
+                  return el(
+                    'div',
+                    { className: 'wpff-slide-card__thumb-wrap' },
+                    el('img', {
+                      src: slide.imageUrl,
+                      alt: slide.imageAlt,
+                      className: 'wpff-slide-card__thumb'
+                    }),
+                    el(
                       Button,
                       {
                         variant: 'secondary',
-                        onClick: ref.open,
-                        className: 'wpff-slide-card__image-btn',
-                        icon: 'format-image'
+                        isSmall: true,
+                        onClick: ref.open
                       },
-                      __('Select image', 'wpff-slider')
+                      __('Replace image', 'wpff-slider')
                     )
-                  }
-                })
-            ),
+                  )
+                }
+                return el(
+                  Button,
+                  {
+                    variant: 'secondary',
+                    onClick: ref.open,
+                    className: 'wpff-slide-card__image-btn',
+                    icon: 'format-image'
+                  },
+                  __('Select image', 'wpff-slider')
+                )
+              }
+            })
+          ),
 
           // Two-column body — heading/description | link options
           el(
@@ -575,11 +625,7 @@
               el(
                 'div',
                 { className: 'wpff-url-input-wrap' },
-                el(
-                  'label',
-                  { className: 'wpff-url-input-wrap__label' },
-                  __('Link URL', 'wpff-slider')
-                ),
+                el('label', { className: 'wpff-url-input-wrap__label' }, __('Link URL', 'wpff-slider')),
                 el(URLInput, {
                   value: slide.linkUrl,
                   placeholder: 'https://',
