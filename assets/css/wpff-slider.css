@@ -214,8 +214,8 @@ a.wpff-slide {
   pointer-events: none;
   padding-top: 2rem;
   padding-bottom: 3.5rem;
-  padding-left: var(--wp--preset--spacing--medium, 2rem);
-  padding-right: var(--wp--preset--spacing--medium, 2rem);
+  padding-left: var(--wp--preset--spacing--50, 2rem);
+  padding-right: var(--wp--preset--spacing--50, 2rem);
 }
 
 .wpff-slide__content-inner {
