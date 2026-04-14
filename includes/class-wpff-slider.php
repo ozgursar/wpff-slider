@@ -131,6 +131,10 @@ class WPFF_Slider {
 						'type'    => 'string',
 						'default' => '',
 					),
+					'aspectRatio'         => array(
+						'type'    => 'string',
+						'default' => '',
+					),
 					'contentPosition'     => array(
 						'type'    => 'string',
 						'default' => 'bottom center',
@@ -203,6 +207,7 @@ class WPFF_Slider {
 			: 'h2';
 		$slider_height        = sanitize_text_field( $attributes['sliderHeight'] ?? '600px' );
 		$slider_height_mobile = sanitize_text_field( $attributes['sliderHeightMobile'] ?? '' );
+		$aspect_ratio         = sanitize_text_field( $attributes['aspectRatio'] ?? '' );
 		$slide_duration       = absint( $attributes['slideDuration'] ?? 6 );
 		$ken_burns            = (bool) ( $attributes['kenBurns'] ?? true );
 		$content_anim         = (bool) ( $attributes['contentAnim'] ?? true );
@@ -286,6 +291,9 @@ class WPFF_Slider {
 		if ( ! preg_match( '/^[0-9]+(?:px|vh|%)$/', $slider_height_mobile ) ) {
 			$slider_height_mobile = '';
 		}
+		if ( ! preg_match( '/^[0-9]+(?:\.[0-9]+)? \/ [0-9]+(?:\.[0-9]+)?$/', $aspect_ratio ) ) {
+			$aspect_ratio = '';
+		}
 
 		/* ---- container ---- */
 
@@ -301,6 +309,9 @@ class WPFF_Slider {
 
 		if ( $slider_height_mobile ) {
 			$style .= sprintf( '--wpff-slider-height-mobile:%s;', $slider_height_mobile );
+		}
+		if ( $aspect_ratio ) {
+			$style .= sprintf( '--wpff-slider-aspect-ratio:%s;', $aspect_ratio );
 		}
 		$style .= '--wpff-heading-size:' . $heading_font_size . ';';
 		$style .= '--wpff-desc-size:' . $desc_font_size . ';';

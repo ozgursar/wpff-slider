@@ -163,6 +163,100 @@
   flex: 1;
 }
 
+/* Aspect ratio preset grid
+   --------------------------------------------------------------------------- */
+
+.wpff-ratio-presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.wpff-ratio-card {
+  background: #f0f0f1;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  padding: 6px 4px 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: border-color 0.15s ease;
+}
+
+.wpff-ratio-card:hover {
+  border-color: #007cba;
+}
+
+.wpff-ratio-card.is-active {
+  border-color: #007cba;
+  background: #e8f4fb;
+}
+
+.wpff-ratio-card__preview {
+  width: 100%;
+  background: #b4b9be;
+  border-radius: 2px;
+}
+
+.wpff-ratio-card__ratio {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1e1e1e;
+  line-height: 1;
+}
+
+.wpff-ratio-card__name {
+  font-size: 10px;
+  color: #757575;
+  line-height: 1;
+}
+
+/* Custom ratio row
+   --------------------------------------------------------------------------- */
+
+.wpff-custom-ratio {
+  margin-top: 10px;
+}
+
+.wpff-custom-ratio__label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #1e1e1e;
+
+  margin: 0 0 6px;
+}
+
+.wpff-custom-ratio__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.wpff-custom-ratio__row .wpff-custom-ratio__input {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.wpff-custom-ratio__row .components-button {
+  height: 32px;
+}
+
+.wpff-custom-ratio__row .wpff-custom-ratio__input .components-text-control__input {
+  text-align: center;
+}
+
+.wpff-custom-ratio__sep {
+  font-size: 16px;
+  color: #757575;
+  flex-shrink: 0;
+}
+
 /* ServerSideRender live preview
    --------------------------------------------------------------------------- */
 

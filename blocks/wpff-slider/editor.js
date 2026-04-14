@@ -5,6 +5,7 @@
   const registerBlockType = wp.blocks.registerBlockType
   const el = wp.element.createElement
   const Fragment = wp.element.Fragment
+  const useState = wp.element.useState
   const __ = wp.i18n.__
   const useBlockProps = wp.blockEditor.useBlockProps
   const InspectorControls = wp.blockEditor.InspectorControls
@@ -51,6 +52,7 @@
       headingTag: { type: 'string', default: 'h2' },
       sliderHeight: { type: 'string', default: '600px' },
       sliderHeightMobile: { type: 'string', default: '' },
+      aspectRatio: { type: 'string', default: '' },
       contentPosition: { type: 'string', default: 'bottom center' },
       textShadow: { type: 'boolean', default: true },
       overlayGradient: { type: 'boolean', default: true },
@@ -76,6 +78,17 @@
           postType: select('core/editor').getCurrentPostType()
         }
       })
+
+      const ratioPresets = [
+        { ratio: '21 / 9', label: '21:9', name: __('Cinematic', 'wpff-slider'), w: 21, h: 9 },
+        { ratio: '16 / 5', label: '16:5', name: __('Wide hero', 'wpff-slider'), w: 16, h: 5 },
+        { ratio: '16 / 6', label: '16:6', name: __('Standard', 'wpff-slider'), w: 16, h: 6 },
+        { ratio: '16 / 7', label: '16:7', name: __('Balanced', 'wpff-slider'), w: 16, h: 7 },
+        { ratio: '3 / 1',  label: '3:1',  name: __('Banner', 'wpff-slider'), w: 3, h: 1 },
+        { ratio: '4 / 1',  label: '4:1',  name: __('Slim banner', 'wpff-slider'), w: 4, h: 1 },
+      ]
+      const [customW, setCustomW] = useState('16')
+      const [customH, setCustomH] = useState('9')
 
       /* ---- slide mutation helpers ---- */
 
@@ -136,8 +149,70 @@
           PanelBody,
           { title: __('Slider Settings', 'wpff-slider'), initialOpen: true },
 
+          el(BaseControl, {
+            label: __('Aspect Ratio', 'wpff-slider'),
+            id: 'wpff-aspect-ratio',
+            __nextHasNoMarginBottom: true
+          },
+            el('div', { className: 'wpff-ratio-presets' },
+              ratioPresets.map(function (p) {
+                var isActive = attributes.aspectRatio === p.ratio
+                return el('button', {
+                  key: p.ratio,
+                  type: 'button',
+                  className: 'wpff-ratio-card' + (isActive ? ' is-active' : ''),
+                  onClick: function () {
+                    setAttributes({ aspectRatio: isActive ? '' : p.ratio })
+                  }
+                },
+                  el('div', {
+                    className: 'wpff-ratio-card__preview',
+                    style: { paddingTop: (p.h / p.w * 100).toFixed(2) + '%' }
+                  }),
+                  el('span', { className: 'wpff-ratio-card__ratio' }, p.label),
+                  el('span', { className: 'wpff-ratio-card__name' }, p.name)
+                )
+              })
+            )
+          ),
+
+          el('div', { className: 'wpff-custom-ratio' },
+            el('p', { className: 'wpff-custom-ratio__label' },
+              __('Custom Ratio', 'wpff-slider')
+            ),
+            el('div', { className: 'wpff-custom-ratio__row' },
+              el(TextControl, {
+                label: __('Width', 'wpff-slider'),
+                hideLabelFromVision: true,
+                value: customW,
+                className: 'wpff-custom-ratio__input',
+                onChange: function (v) { setCustomW(v) },
+                __nextHasNoMarginBottom: true
+              }),
+              el('span', { className: 'wpff-custom-ratio__sep' }, '/'),
+              el(TextControl, {
+                label: __('Height', 'wpff-slider'),
+                hideLabelFromVision: true,
+                value: customH,
+                className: 'wpff-custom-ratio__input',
+                onChange: function (v) { setCustomH(v) },
+                __nextHasNoMarginBottom: true
+              }),
+              el(Button, {
+                variant: 'secondary',
+                onClick: function () {
+                  var w = parseFloat(customW)
+                  var h = parseFloat(customH)
+                  if (w > 0 && h > 0) {
+                    setAttributes({ aspectRatio: w + ' / ' + h })
+                  }
+                }
+              }, __('Apply', 'wpff-slider'))
+            )
+          ),
+
           el(UnitControl, {
-            label: __('Slider height', 'wpff-slider'),
+            label: __('Min-height (desktop)', 'wpff-slider'),
             value: attributes.sliderHeight,
             units: [
               { value: 'px', label: 'px' },
@@ -150,7 +225,7 @@
           }),
 
           el(UnitControl, {
-            label: __('Slider height (Mobile)', 'wpff-slider'),
+            label: __('Min-height (mobile)', 'wpff-slider'),
             value: attributes.sliderHeightMobile,
             placeholder: __('Same as desktop', 'wpff-slider'),
             units: [
