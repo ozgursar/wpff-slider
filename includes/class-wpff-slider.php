@@ -376,7 +376,6 @@ class WPFF_Slider {
 			'content_flex'      => $content_flex,
 		);
 
-
 		$html .= '<div class="wpff-slider__track">';
 
 		foreach ( $slides as $i => $slide ) {
@@ -449,7 +448,6 @@ class WPFF_Slider {
 
 		$html       = '';
 		$heading_id = ! empty( $heading ) ? wp_unique_id( 'wpff-heading-' ) : '';
-
 
 		$aria_hidden = $is_first ? 'false' : 'true';
 		$inert_attr  = $is_first ? '' : ' inert';
