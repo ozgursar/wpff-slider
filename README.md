@@ -4,26 +4,29 @@ A WordPress Gutenberg block that renders a full-width image slider with a Ken Bu
 
 ## Features
 
-- **Ken Burns effect** — four alternating pan-and-zoom animations cycle across slides (toggle on/off)
-- **Fade In/Out effect** — heading, description, and button animate in/out on slide transitions (toggle on/off)
+- **Ken Burns effect** — four alternating pan-and-zoom animations cycle across slides (toggle on/off); zoom and pan amount is configurable (5–30 %, default 15 %)
+- **Fade In/Out effect** — pre-title, heading, description, and button animate in/out on slide transitions (toggle on/off)
 - **Cross-fade transitions** — smooth opacity-based slide transitions with configurable duration (3–20 seconds per slide)
 - **Navigation dots** — accessible dot navigation with hover and focus styles; hidden when only one slide is present
 - **Hover pause** — auto-play pauses when the user hovers over the slider
 - **Touch swipe** — swipe left or right on touch devices to navigate slides; short taps pass through to links normally
 - **Keyboard navigation** — left/right arrow keys navigate slides from anywhere on the page; ignored when typing in a form field
+- **Per-slide pre-title** — a small label line above the heading on each slide, with independent font-size and color controls
 - **Per-slide link style** — choose between making the full slide clickable or showing a button; button label is configurable
+- **Per-slide text styling** — optional color override, background color, and padding for the heading and description on each slide; accepts hex (including 8-digit hex with alpha) or `rgba()` values
 - **Content position** — 9 positions (top/center/bottom × left/center/right)
 - **Image focus** — top, center, or bottom image cropping anchor
 - **Overlay gradient** — optional darkening gradient over the lower portion of the image (toggle on/off)
-- **Text shadow** — optional shadow behind heading and description text (toggle on/off)
+- **Text shadow** — optional shadow behind pre-title, heading, and description text (toggle on/off)
 - **Heading tag** — choose H1–H6, paragraph, or span for the slide heading
-- **Configurable font sizes** — separate S/M/L/XL presets (plus custom) for heading and description
-- **Configurable colors** — separate color pickers for heading and description text
+- **Configurable font sizes** — separate S/M/L/XL presets (plus custom) for pre-title, heading, and description
+- **Configurable colors** — separate color pickers for pre-title, heading, and description text
+- **Constrain content width** — optionally limits slide content to the theme's wide width (falls back to 1200 px)
 - **Responsive height** — set separate slider heights for desktop and mobile
 - **Responsive text alignment** — text is always horizontally centered on mobile regardless of the desktop content position setting
 - **Shortcode support** — embed the slider in Elementor, WPBakery, or any page builder via `[wpff_slider id="123"]` using a Synced Pattern
 - **Performance** — first slide image loads eagerly with `fetchpriority="high"`; subsequent slides load lazily. `wp_get_attachment_image()` is used for full srcset/sizes support. Frontend script is deferred in `<head>` for early download without blocking rendering
-- **Reduced motion** — Ken Burns animations are disabled for users who prefer reduced motion
+- **Reduced motion** — Ken Burns and content animations are disabled for users who prefer reduced motion
 - **Accessibility** — slider is a labelled carousel region; non-active slides are hidden from assistive technologies via `aria-hidden` and `inert`; dot buttons use `aria-pressed`; links that open in a new tab announce this to screen readers
 
 ## Development
@@ -79,8 +82,8 @@ The following source → output pairs are processed:
 4. Add more slides with the **Add Slide** button
 5. Reorder or remove slides using the arrow and trash buttons on each slide card
 6. Adjust appearance settings in the sidebar panels:
-   - **Slider Settings** — height, image focus, content position, heading tag, Ken Burns, Fade In/Out, text shadow, gradient, slide duration
-   - **Text & Colors** — heading size, description size, heading color, description color
+   - **Slider Settings** — aspect ratio, height, image focus, content position, heading tag, Ken Burns (with amount), Fade In/Out, text shadow, gradient, content width constraint, slide duration
+   - **Text & Colors** — pre-title/heading/description font size and color
    - **Shortcode** — shows the `[wpff_slider]` shortcode when editing a Synced Pattern
 
 ## Using the Slider in Other Page Builders
@@ -98,27 +101,32 @@ Changes made to the Synced Pattern are reflected everywhere the shortcode is use
 
 ### Slider Settings panel
 
-| Setting                   | Default             | Description                                                      |
-| ------------------------- | ------------------- | ---------------------------------------------------------------- |
-| Slider height             | `600px`             | Height of the slider on desktop. Accepts `px`, `vh`, or `%`      |
-| Slider height (Mobile)    | _(same as desktop)_ | Override height on screens ≤ 768 px                              |
-| Image Focus               | Center              | Where the image is anchored when cropped (Top / Center / Bottom) |
-| Content Position          | Bottom Center       | Where the heading and description appear on the slide            |
-| Heading tag               | H2                  | HTML element used for the slide heading                          |
-| Enable Ken Burns effect   | On                  | Toggles the pan-and-zoom animation                               |
-| Enable Fade In/Out effect | On                  | Toggles the fade-up/fade-down animation on slide content         |
-| Enable text shadow        | On                  | Toggles a soft drop-shadow behind heading and description        |
-| Enable overlay gradient   | On                  | Toggles a bottom-darkening gradient for text legibility          |
-| Slide Duration            | 6 s                 | How long each slide is displayed before advancing                |
+| Setting                   | Default             | Description                                                                        |
+| ------------------------- | ------------------- | ---------------------------------------------------------------------------------- |
+| Aspect Ratio              | 16:6 (Standard)     | Six presets or a custom W/H ratio; leave empty to rely on min-height only          |
+| Slider height             | `400px`             | Minimum height of the slider on desktop. Accepts `px`, `vh`, or `%`               |
+| Slider height (Mobile)    | `450px`             | Override minimum height on screens ≤ 768 px                                       |
+| Image Focus               | Center              | Where the image is anchored when cropped (Top / Center / Bottom)                  |
+| Content Position          | Bottom Left         | Where the slide content appears — 9 positions (top/center/bottom × left/center/right) |
+| Heading tag               | H2                  | HTML element used for the slide heading (H1–H6, paragraph, or span)               |
+| Enable Ken Burns effect   | On                  | Toggles the pan-and-zoom animation                                                 |
+| Ken Burns amount          | 15 %                | Controls zoom and pan intensity (5–30 %). Only shown when Ken Burns is enabled     |
+| Enable Fade In/Out effect | On                  | Toggles the fade-up/fade-down animation on slide content                           |
+| Enable text shadow        | On                  | Toggles a soft drop-shadow behind pre-title, heading, and description              |
+| Enable overlay gradient   | On                  | Toggles a bottom-darkening gradient for text legibility                            |
+| Constrain content width   | On                  | Limits slide content to the theme's wide width (falls back to 1200 px)            |
+| Slide Duration            | 6 s                 | How long each slide is displayed before advancing                                  |
 
 ### Text & Colors panel
 
-| Setting           | Default     | Description                              |
-| ----------------- | ----------- | ---------------------------------------- |
-| Heading size      | L (2.5 rem) | S / M / L / XL presets or a custom value |
-| Description size  | M (1 rem)   | S / M / L / XL presets or a custom value |
-| Heading color     | White       | Color picker for the slide heading       |
-| Description color | White       | Color picker for the slide description   |
+| Setting           | Default      | Description                                        |
+| ----------------- | ------------ | -------------------------------------------------- |
+| Pre-title size    | S (0.75 rem) | XS / S / M / L presets or a custom value           |
+| Pre-title color   | White        | Color picker for the pre-title text                |
+| Heading size      | L (2.5 rem)  | S / M / L / XL presets or a custom value           |
+| Description size  | M (1 rem)    | S / M / L / XL presets or a custom value           |
+| Heading color     | White        | Color picker for the slide heading                 |
+| Description color | White        | Color picker for the slide description             |
 
 ### Per-slide fields
 

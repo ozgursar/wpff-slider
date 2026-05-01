@@ -209,6 +209,29 @@ class WPFF_Slider {
 	}
 
 	// -------------------------------------------------------------------------
+	// CSS value sanitisers
+	// -------------------------------------------------------------------------
+
+	private function sanitize_css_color( string $value ): string {
+		$value = trim( $value );
+		if ( preg_match( '/^#[0-9a-fA-F]{3,8}$/', $value ) ) {
+			return $value;
+		}
+		if ( preg_match( '/^rgba?\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+(?:\s*,\s*[\d.]+)?\s*\)$/', $value ) ) {
+			return $value;
+		}
+		return '';
+	}
+
+	private function sanitize_css_padding( string $value ): string {
+		$value = trim( $value );
+		if ( preg_match( '/^[\d.]+(?:px|rem|em|%|vh|vw)(?:\s+[\d.]+(?:px|rem|em|%|vh|vw)){0,3}$/', $value ) ) {
+			return $value;
+		}
+		return '';
+	}
+
+	// -------------------------------------------------------------------------
 	// HTML builder
 	// -------------------------------------------------------------------------
 
@@ -430,9 +453,15 @@ class WPFF_Slider {
 		$meta_alt  = $image_id > 0 ? get_post_meta( $image_id, '_wp_attachment_image_alt', true ) : '';
 		$image_alt = $meta_alt ? $meta_alt : $image_alt;
 
-		$pretitle     = $slide['pretitle'] ?? '';
-		$heading      = $slide['heading'] ?? '';
-		$desc         = $slide['description'] ?? '';
+		$pretitle             = $slide['pretitle'] ?? '';
+		$heading              = $slide['heading'] ?? '';
+		$heading_color_override = $this->sanitize_css_color( $slide['headingColorOverride'] ?? '' );
+		$heading_bg_color     = $this->sanitize_css_color( $slide['headingBgColor'] ?? '' );
+		$heading_bg_padding   = $this->sanitize_css_padding( $slide['headingBgPadding'] ?? '' );
+		$desc                 = $slide['description'] ?? '';
+		$desc_color_override  = $this->sanitize_css_color( $slide['descColorOverride'] ?? '' );
+		$desc_bg_color        = $this->sanitize_css_color( $slide['descBgColor'] ?? '' );
+		$desc_bg_padding      = $this->sanitize_css_padding( $slide['descBgPadding'] ?? '' );
 		$link_url     = esc_url( $slide['linkUrl'] ?? '' );
 		$link_new_tab = ! empty( $slide['linkNewTab'] );
 
@@ -527,15 +556,41 @@ class WPFF_Slider {
 				);
 			}
 			if ( $heading ) {
-				$html .= sprintf(
-					'<%1$s id="%2$s" class="wpff-slide__heading">%3$s</%1$s>',
+				$h_styles = array();
+				if ( $heading_color_override ) {
+					$h_styles[] = 'color:' . esc_attr( $heading_color_override );
+				}
+				if ( $heading_bg_color ) {
+					$h_styles[] = 'background-color:' . esc_attr( $heading_bg_color );
+				}
+				if ( $heading_bg_padding ) {
+					$h_styles[] = 'padding:' . esc_attr( $heading_bg_padding );
+				}
+				$h_el_style = $h_styles ? ' style="' . implode( ';', $h_styles ) . '"' : '';
+				$h_class    = 'wpff-slide__heading' . ( $heading_bg_color ? ' wpff-slide__heading--has-bg' : '' );
+				$html      .= sprintf(
+					'<%1$s id="%2$s" class="%3$s"%4$s>%5$s</%1$s>',
 					$heading_tag,
 					esc_attr( $heading_id ),
+					esc_attr( $h_class ),
+					$h_el_style,
 					esc_html( $heading )
 				);
 			}
 			if ( $desc ) {
-				$html .= '<div class="wpff-slide__description">'
+				$d_styles = array();
+				if ( $desc_color_override ) {
+					$d_styles[] = 'color:' . esc_attr( $desc_color_override );
+				}
+				if ( $desc_bg_color ) {
+					$d_styles[] = 'background-color:' . esc_attr( $desc_bg_color );
+				}
+				if ( $desc_bg_padding ) {
+					$d_styles[] = 'padding:' . esc_attr( $desc_bg_padding );
+				}
+				$d_el_style = $d_styles ? ' style="' . implode( ';', $d_styles ) . '"' : '';
+				$d_class    = 'wpff-slide__description' . ( $desc_bg_color ? ' wpff-slide__description--has-bg' : '' );
+				$html .= '<div class="' . esc_attr( $d_class ) . '"' . $d_el_style . '>'
 					. wpautop( wp_kses( $desc, array() ) )
 					. '</div>';
 			}

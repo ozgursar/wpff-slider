@@ -107,7 +107,13 @@
               imageAlt: '',
               pretitle: '',
               heading: '',
+              headingColorOverride: '',
+              headingBgColor: '',
+              headingBgPadding: '',
               description: '',
+              descColorOverride: '',
+              descBgColor: '',
+              descBgPadding: '',
               linkUrl: '',
               linkNewTab: false,
               linkStyle: 'full',
@@ -654,7 +660,6 @@
               el(TextControl, {
                 label: __('Pre-title', 'wpff-slider'),
                 value: slide.pretitle || '',
-                placeholder: __('Optional pre-title', 'wpff-slider'),
                 autoComplete: 'off',
                 onChange: function (v) {
                   updateSlide(idx, 'pretitle', v)
@@ -663,20 +668,114 @@
               el(TextControl, {
                 label: __('Heading', 'wpff-slider'),
                 value: slide.heading,
-                placeholder: __('Optional heading', 'wpff-slider'),
                 autoComplete: 'off',
                 onChange: function (v) {
                   updateSlide(idx, 'heading', v)
                 }
               }),
+              el(
+                'fieldset',
+                { className: 'wpff-optional-styling' },
+                el('legend', null, __('Optional Heading Styling', 'wpff-slider')),
+                el(
+                  'div',
+                  { className: 'wpff-inline-fields' },
+                  el(
+                    'div',
+                    { className: 'wpff-inline-fields__item' },
+                    el(TextControl, {
+                      label: __('Color Override', 'wpff-slider'),
+                      value: slide.headingColorOverride || '',
+                      placeholder: '#rrggbbaa or rgba()',
+                      autoComplete: 'off',
+                      onChange: function (v) {
+                        updateSlide(idx, 'headingColorOverride', v)
+                      }
+                    })
+                  ),
+                  el(
+                    'div',
+                    { className: 'wpff-inline-fields__item' },
+                    el(TextControl, {
+                      label: __('Background', 'wpff-slider'),
+                      value: slide.headingBgColor || '',
+                      placeholder: '#rrggbbaa or rgba()',
+                      autoComplete: 'off',
+                      onChange: function (v) {
+                        updateSlide(idx, 'headingBgColor', v)
+                      }
+                    })
+                  ),
+                  el(
+                    'div',
+                    { className: 'wpff-inline-fields__item' },
+                    el(TextControl, {
+                      label: __('Padding', 'wpff-slider'),
+                      value: slide.headingBgPadding || '',
+                      placeholder: '4px 10px',
+                      autoComplete: 'off',
+                      onChange: function (v) {
+                        updateSlide(idx, 'headingBgPadding', v)
+                      }
+                    })
+                  )
+                )
+              ),
               el(TextareaControl, {
                 label: __('Description', 'wpff-slider'),
                 value: slide.description,
-                placeholder: __('Optional description', 'wpff-slider'),
                 onChange: function (v) {
                   updateSlide(idx, 'description', v.replace(/\n{3,}/g, '\n\n'))
                 }
-              })
+              }),
+              el(
+                'fieldset',
+                { className: 'wpff-optional-styling' },
+                el('legend', null, __('Optional Description Styling', 'wpff-slider')),
+                el(
+                  'div',
+                  { className: 'wpff-inline-fields' },
+                  el(
+                    'div',
+                    { className: 'wpff-inline-fields__item' },
+                    el(TextControl, {
+                      label: __('Color Override', 'wpff-slider'),
+                      value: slide.descColorOverride || '',
+                      placeholder: '#rrggbbaa or rgba()',
+                      autoComplete: 'off',
+                      onChange: function (v) {
+                        updateSlide(idx, 'descColorOverride', v)
+                      }
+                    })
+                  ),
+                  el(
+                    'div',
+                    { className: 'wpff-inline-fields__item' },
+                    el(TextControl, {
+                      label: __('Background', 'wpff-slider'),
+                      value: slide.descBgColor || '',
+                      placeholder: '#rrggbbaa or rgba()',
+                      autoComplete: 'off',
+                      onChange: function (v) {
+                        updateSlide(idx, 'descBgColor', v)
+                      }
+                    })
+                  ),
+                  el(
+                    'div',
+                    { className: 'wpff-inline-fields__item' },
+                    el(TextControl, {
+                      label: __('Padding', 'wpff-slider'),
+                      value: slide.descBgPadding || '',
+                      placeholder: '4px 10px',
+                      autoComplete: 'off',
+                      onChange: function (v) {
+                        updateSlide(idx, 'descBgPadding', v)
+                      }
+                    })
+                  )
+                )
+              )
             ),
 
             // Column 2 — link URL and conditional link options

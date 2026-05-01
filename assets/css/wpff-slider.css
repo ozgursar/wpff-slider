@@ -267,6 +267,11 @@ a.wpff-slide {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
+.wpff-slide__heading--has-bg,
+.wpff-slide__description--has-bg {
+  width: fit-content;
+}
+
 .wpff-slide__content--no-shadow .wpff-slide__pretitle,
 .wpff-slide__content--no-shadow .wpff-slide__heading,
 .wpff-slide__content--no-shadow .wpff-slide__description {
