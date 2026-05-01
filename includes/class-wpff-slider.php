@@ -167,6 +167,14 @@ class WPFF_Slider {
 						'type'    => 'boolean',
 						'default' => true,
 					),
+					'pretitleFontSize'    => array(
+						'type'    => 'string',
+						'default' => '0.75rem',
+					),
+					'pretitleColor'       => array(
+						'type'    => 'string',
+						'default' => '#ffffff',
+					),
 				),
 			)
 		);
@@ -223,12 +231,17 @@ class WPFF_Slider {
 		$desc_font_size       = sanitize_text_field( $attributes['descriptionFontSize'] ?? '1rem' );
 		$heading_color        = sanitize_text_field( $attributes['headingColor'] ?? '#ffffff' );
 		$desc_color           = sanitize_text_field( $attributes['descriptionColor'] ?? '#ffffff' );
+		$pretitle_font_size   = sanitize_text_field( $attributes['pretitleFontSize'] ?? '0.75rem' );
+		$pretitle_color       = sanitize_text_field( $attributes['pretitleColor'] ?? '#ffffff' );
 
 		if ( ! preg_match( '/^[0-9]+(?:\.[0-9]+)?(?:px|rem|em|vw|%)$/', $heading_font_size ) ) {
 			$heading_font_size = '2.5rem';
 		}
 		if ( ! preg_match( '/^[0-9]+(?:\.[0-9]+)?(?:px|rem|em|vw|%)$/', $desc_font_size ) ) {
 			$desc_font_size = '1rem';
+		}
+		if ( ! preg_match( '/^[0-9]+(?:\.[0-9]+)?(?:px|rem|em|vw|%)$/', $pretitle_font_size ) ) {
+			$pretitle_font_size = '0.75rem';
 		}
 
 		$position_whitelist = array(
@@ -326,6 +339,10 @@ class WPFF_Slider {
 		if ( $desc_color ) {
 			$style .= '--wpff-desc-color:' . $desc_color . ';';
 		}
+		$style .= '--wpff-pretitle-size:' . $pretitle_font_size . ';';
+		if ( $pretitle_color ) {
+			$style .= '--wpff-pretitle-color:' . $pretitle_color . ';';
+		}
 
 		$slider_classes = 'wpff-slider' . ( $content_anim ? ' wpff-slider--content-anim' : '' );
 
@@ -407,6 +424,7 @@ class WPFF_Slider {
 		$meta_alt  = $image_id > 0 ? get_post_meta( $image_id, '_wp_attachment_image_alt', true ) : '';
 		$image_alt = $meta_alt ? $meta_alt : $image_alt;
 
+		$pretitle     = $slide['pretitle'] ?? '';
 		$heading      = $slide['heading'] ?? '';
 		$desc         = $slide['description'] ?? '';
 		$link_url     = esc_url( $slide['linkUrl'] ?? '' );
@@ -424,6 +442,7 @@ class WPFF_Slider {
 
 		$html       = '';
 		$heading_id = ! empty( $heading ) ? wp_unique_id( 'wpff-heading-' ) : '';
+
 
 		$aria_hidden = $is_first ? 'false' : 'true';
 		$inert_attr  = $is_first ? '' : ' inert';
@@ -482,8 +501,8 @@ class WPFF_Slider {
 			);
 		$html .= '</div>';
 
-		// Content overlay — heading, description, and optional button.
-		if ( $heading || $desc || $use_button ) {
+		// Content overlay — pre-title, heading, description, and optional button.
+		if ( $pretitle || $heading || $desc || $use_button ) {
 			$content_cls = 'wpff-slide__content'
 			. ( $block_settings['text_shadow'] ? '' : ' wpff-slide__content--no-shadow' )
 			. ( $block_settings['overlay_gradient'] ? '' : ' wpff-slide__content--no-gradient' )
@@ -496,6 +515,12 @@ class WPFF_Slider {
 				esc_attr( $block_settings['content_flex']['text'] )
 			);
 
+			if ( $pretitle ) {
+				$html .= sprintf(
+					'<span class="wpff-slide__pretitle">%s</span>',
+					esc_html( $pretitle )
+				);
+			}
 			if ( $heading ) {
 				$html .= sprintf(
 					'<%1$s id="%2$s" class="wpff-slide__heading">%3$s</%1$s>',

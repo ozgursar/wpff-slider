@@ -144,9 +144,11 @@
   .wpff-slide__image {
     animation: none;
   }
+  .wpff-slider--content-anim .wpff-slide--active .wpff-slide__pretitle,
   .wpff-slider--content-anim .wpff-slide--active .wpff-slide__heading,
   .wpff-slider--content-anim .wpff-slide--active .wpff-slide__description,
   .wpff-slider--content-anim .wpff-slide--active .wpff-slide__button,
+  .wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__pretitle,
   .wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__heading,
   .wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__description,
   .wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__button {
@@ -179,12 +181,17 @@
   }
 }
 
+.wpff-slider--content-anim .wpff-slide--active .wpff-slide__pretitle {
+  animation: wpff-fadein-up 0.55s ease-out 0.1s both;
+}
+
 .wpff-slider--content-anim .wpff-slide--active .wpff-slide__heading,
 .wpff-slider--content-anim .wpff-slide--active .wpff-slide__description,
 .wpff-slider--content-anim .wpff-slide--active .wpff-slide__button {
   animation: wpff-fadein-up 0.55s ease-out 0.2s both;
 }
 
+.wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__pretitle,
 .wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__heading,
 .wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__description,
 .wpff-slider--content-anim .wpff-slide--leaving .wpff-slide__button {
@@ -231,6 +238,17 @@ a.wpff-slide {
   align-self: center;
 }
 
+.wpff-slide__pretitle {
+  display: block;
+  color: var(--wpff-pretitle-color, #fff);
+  font-size: var(--wpff-pretitle-size, 0.75rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  margin: 0 0 0.4rem;
+  opacity: 0.85;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
 .wpff-slide__heading {
   color: var(--wpff-heading-color, #fff);
   font-size: clamp(1.6rem, 4vw, var(--wpff-heading-size, 2.5rem));
@@ -249,6 +267,7 @@ a.wpff-slide {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
+.wpff-slide__content--no-shadow .wpff-slide__pretitle,
 .wpff-slide__content--no-shadow .wpff-slide__heading,
 .wpff-slide__content--no-shadow .wpff-slide__description {
   text-shadow: none;

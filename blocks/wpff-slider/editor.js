@@ -61,7 +61,9 @@
       descriptionFontSize: { type: 'string', default: '1rem' },
       headingColor: { type: 'string', default: '#ffffff' },
       descriptionColor: { type: 'string', default: '#ffffff' },
-      constrainContent: { type: 'boolean', default: true }
+      constrainContent: { type: 'boolean', default: true },
+      pretitleFontSize: { type: 'string', default: '0.75rem' },
+      pretitleColor: { type: 'string', default: '#ffffff' }
     },
 
     // -----------------------------------------------------------------
@@ -102,6 +104,7 @@
               imageId: 0,
               imageUrl: '',
               imageAlt: '',
+              pretitle: '',
               heading: '',
               description: '',
               linkUrl: '',
@@ -391,6 +394,42 @@
           el(
             BaseControl,
             {
+              label: __('Pre-title size', 'wpff-slider'),
+              __nextHasNoMarginBottom: true
+            },
+            el(FontSizePicker, {
+              fontSizes: [
+                { name: 'XS', slug: 'xs', size: '0.65rem' },
+                { name: 'S', slug: 's', size: '0.75rem' },
+                { name: 'M', slug: 'm', size: '0.875rem' },
+                { name: 'L', slug: 'l', size: '1rem' }
+              ],
+              value: attributes.pretitleFontSize,
+              onChange: function (v) {
+                setAttributes({ pretitleFontSize: v === undefined ? '0.75rem' : v })
+              },
+              withReset: true,
+              disableCustomFontSizes: false
+            })
+          ),
+
+          el(
+            BaseControl,
+            {
+              label: __('Pre-title color', 'wpff-slider'),
+              __nextHasNoMarginBottom: true
+            },
+            el(ColorPalette, {
+              value: attributes.pretitleColor,
+              onChange: function (v) {
+                setAttributes({ pretitleColor: v || '' })
+              }
+            })
+          ),
+
+          el(
+            BaseControl,
+            {
               label: __('Heading size', 'wpff-slider'),
               __nextHasNoMarginBottom: true
             },
@@ -598,6 +637,15 @@
               'div',
               { className: 'wpff-slide-card__col' },
 
+              el(TextControl, {
+                label: __('Pre-title', 'wpff-slider'),
+                value: slide.pretitle || '',
+                placeholder: __('Optional pre-title', 'wpff-slider'),
+                autoComplete: 'off',
+                onChange: function (v) {
+                  updateSlide(idx, 'pretitle', v)
+                }
+              }),
               el(TextControl, {
                 label: __('Heading', 'wpff-slider'),
                 value: slide.heading,
