@@ -167,6 +167,10 @@ class WPFF_Slider {
 						'type'    => 'boolean',
 						'default' => true,
 					),
+					'kenBurnsAmount'      => array(
+						'type'    => 'integer',
+						'default' => 15,
+					),
 					'pretitleFontSize'    => array(
 						'type'    => 'string',
 						'default' => '0.75rem',
@@ -222,6 +226,7 @@ class WPFF_Slider {
 		$aspect_ratio         = sanitize_text_field( $attributes['aspectRatio'] ?? '' );
 		$slide_duration       = absint( $attributes['slideDuration'] ?? 6 );
 		$ken_burns            = (bool) ( $attributes['kenBurns'] ?? true );
+		$ken_burns_amount     = max( 5, min( 30, absint( $attributes['kenBurnsAmount'] ?? 15 ) ) );
 		$content_anim         = (bool) ( $attributes['contentAnim'] ?? true );
 		$content_position     = sanitize_text_field( $attributes['contentPosition'] ?? 'bottom center' );
 		$text_shadow          = (bool) ( $attributes['textShadow'] ?? true );
@@ -339,6 +344,8 @@ class WPFF_Slider {
 		if ( $desc_color ) {
 			$style .= '--wpff-desc-color:' . $desc_color . ';';
 		}
+		$style .= '--wpff-kb-scale:' . number_format( $ken_burns_amount / 100, 2 ) . ';';
+		$style .= '--wpff-kb-pan:' . number_format( $ken_burns_amount / 5, 1 ) . '%;';
 		$style .= '--wpff-pretitle-size:' . $pretitle_font_size . ';';
 		if ( $pretitle_color ) {
 			$style .= '--wpff-pretitle-color:' . $pretitle_color . ';';

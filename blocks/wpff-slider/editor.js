@@ -63,7 +63,8 @@
       descriptionColor: { type: 'string', default: '#ffffff' },
       constrainContent: { type: 'boolean', default: true },
       pretitleFontSize: { type: 'string', default: '0.75rem' },
-      pretitleColor: { type: 'string', default: '#ffffff' }
+      pretitleColor: { type: 'string', default: '#ffffff' },
+      kenBurnsAmount: { type: 'integer', default: 15 }
     },
 
     // -----------------------------------------------------------------
@@ -341,6 +342,19 @@
               setAttributes({ kenBurns: v })
             }
           }),
+
+          attributes.kenBurns !== false
+            ? el(RangeControl, {
+                label: __('Ken Burns amount (%)', 'wpff-slider'),
+                value: attributes.kenBurnsAmount !== undefined ? attributes.kenBurnsAmount : 15,
+                min: 5,
+                max: 30,
+                step: 1,
+                onChange: function (v) {
+                  setAttributes({ kenBurnsAmount: v })
+                }
+              })
+            : null,
 
           el(CheckboxControl, {
             label: __('Enable fade in/out effect', 'wpff-slider'),
