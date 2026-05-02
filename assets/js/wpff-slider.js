@@ -37,6 +37,7 @@
         let currentIndex  = 0;
         let timer         = null;
         let isAnimating   = false;
+        let editorPaused  = !!sliderEl.closest('[data-editor-paused]');
 
         /* ---- Ken Burns helpers ---- */
 
@@ -115,20 +116,24 @@
             }
         }
 
+        function resumeTimer() {
+            if (!editorPaused) startTimer();
+        }
+
         /* ---- dot navigation ---- */
 
         dots.forEach(function (dot, i) {
             dot.addEventListener('click', function () {
                 stopTimer();
                 goToSlide(i);
-                startTimer();
+                resumeTimer();
             });
         });
 
         /* ---- hover pause ---- */
 
         sliderEl.addEventListener('mouseenter', stopTimer);
-        sliderEl.addEventListener('mouseleave', startTimer);
+        sliderEl.addEventListener('mouseleave', resumeTimer);
 
         /* ---- touch swipe ---- */
 
@@ -145,7 +150,7 @@
                 e.preventDefault();
                 stopTimer();
                 if (delta < 0) advance(); else goToPrev();
-                startTimer();
+                resumeTimer();
             });
         }
 
@@ -158,19 +163,24 @@
                 if (e.key === 'ArrowLeft') {
                     stopTimer();
                     goToPrev();
-                    startTimer();
+                    resumeTimer();
                 } else if (e.key === 'ArrowRight') {
                     stopTimer();
                     advance();
-                    startTimer();
+                    resumeTimer();
                 }
             });
         }
 
+        /* ---- editor pause/resume via custom events ---- */
+
+        sliderEl.addEventListener('wpff:pause',  function () { editorPaused = true;  stopTimer(); });
+        sliderEl.addEventListener('wpff:resume', function () { editorPaused = false; startTimer(); });
+
         /* ---- kick off ---- */
 
         startKenBurns(slides[0]);
-        startTimer();
+        if (!sliderEl.closest('[data-editor-paused]')) startTimer();
     }
 
     // -------------------------------------------------------------------------

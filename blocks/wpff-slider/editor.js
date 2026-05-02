@@ -6,6 +6,8 @@
   const el = wp.element.createElement
   const Fragment = wp.element.Fragment
   const useState = wp.element.useState
+  const useEffect = wp.element.useEffect
+  const useRef = wp.element.useRef
   const __ = wp.i18n.__
   const useBlockProps = wp.blockEditor.useBlockProps
   const InspectorControls = wp.blockEditor.InspectorControls
@@ -19,6 +21,7 @@
   const TextControl = wp.components.TextControl
   const TextareaControl = wp.components.TextareaControl
   const CheckboxControl = wp.components.CheckboxControl
+  const ToggleControl = wp.components.ToggleControl
   const RadioControl = wp.components.RadioControl
   const NumberControl = wp.components.__experimentalNumberControl
   const Button = wp.components.Button
@@ -179,13 +182,11 @@
         ))
       }
 
-      const slideProps = { key: slide.id || i, className: slideCls, 'aria-hidden': isFirst ? 'false' : 'true' }
-      if (fullLink) {
-        slideProps.href = linkUrl
-        if (newTab) { slideProps.target = '_blank'; slideProps.rel = 'noopener noreferrer' }
-        return el('a', slideProps, slideChildren)
-      }
-      return el('div', slideProps, slideChildren)
+      // Always use <div> in the editor preview — switching to <a> would change
+      // the element type, causing React to remount and the slider JS to lose
+      // its DOM reference (slide goes black). Links aren't functional in the
+      // editor anyway.
+      return el('div', { key: slide.id || i, className: slideCls, 'aria-hidden': isFirst ? 'false' : 'true' }, slideChildren)
     })
 
     let dotsEl = null
@@ -276,6 +277,15 @@
       ]
       const [customW, setCustomW] = useState('16')
       const [customH, setCustomH] = useState('9')
+      const [stickyPreview, setStickyPreview] = useState(true)
+      const [paused, setPaused] = useState(false)
+      const previewRef = useRef(null)
+
+      useEffect(() => {
+        const sliderEl = previewRef.current && previewRef.current.querySelector('.wpff-slider')
+        if (!sliderEl) return
+        sliderEl.dispatchEvent(new CustomEvent(paused ? 'wpff:pause' : 'wpff:resume'))
+      }, [paused])
 
       /* ---- slide mutation helpers ---- */
 
@@ -342,6 +352,20 @@
         el(
           PanelBody,
           { title: __('Slider Settings', 'wpff-slider'), initialOpen: true },
+
+          el(ToggleControl, {
+            label: __('Sticky preview while editing', 'wpff-slider'),
+            checked: stickyPreview,
+            onChange: setStickyPreview,
+            __nextHasNoMarginBottom: true
+          }),
+
+          el(ToggleControl, {
+            label: __('Pause auto-play while editing', 'wpff-slider'),
+            checked: paused,
+            onChange: setPaused,
+            __nextHasNoMarginBottom: true
+          }),
 
           el(
             BaseControl,
@@ -1046,7 +1070,11 @@
         mainContent = el(
           'div',
           { className: 'wpff-slides-list' },
-          el('div', { className: 'wpff-preview-sticky-wrap' }, buildPreview(attributes)),
+          el('div', {
+            className: stickyPreview ? 'wpff-preview-sticky-wrap' : '',
+            'data-editor-paused': paused ? '' : undefined,
+            ref: previewRef
+          }, buildPreview(attributes)),
           cards,
           el(
             Button,
