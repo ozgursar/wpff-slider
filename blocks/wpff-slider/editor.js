@@ -26,11 +26,193 @@
   const BaseControl = wp.components.BaseControl
   const ColorPalette = wp.components.ColorPalette
   const FontSizePicker = wp.blockEditor.FontSizePicker
-  const ServerSideRender = wp.serverSideRender
   const useSelect = wp.data.useSelect
 
   function uid() {
     return Math.random().toString(36).slice(2, 9)
+  }
+
+  // -------------------------------------------------------------------------
+  // Client-side preview — mirrors the PHP render_block output in JS so the
+  // editor never needs to make a REST request (avoids URL-length limits when
+  // there are many slides with long image URLs / text content).
+  // -------------------------------------------------------------------------
+
+  function buildPreview(attributes) {
+    const slides = (attributes.slides || []).filter(s => s.imageUrl)
+    if (!slides.length) return null
+
+    const validHeight = /^[0-9]+(?:px|vh|%)$/
+    const validUnit   = /^[0-9]+(?:\.[0-9]+)?(?:px|rem|em|vw|%)$/
+    const validRatio  = /^[0-9]+(?:\.[0-9]+)? \/ [0-9]+(?:\.[0-9]+)?$/
+
+    const sliderHeight       = validHeight.test(attributes.sliderHeight || '')       ? attributes.sliderHeight       : '400px'
+    const sliderHeightMobile = validHeight.test(attributes.sliderHeightMobile || '') ? attributes.sliderHeightMobile : ''
+    const aspectRatio        = validRatio.test(attributes.aspectRatio || '')          ? attributes.aspectRatio        : ''
+    const slideDuration      = Math.max(1, parseInt(attributes.slideDuration, 10) || 6)
+    const kenBurns           = attributes.kenBurns !== false
+    const kenBurnsAmount     = Math.max(5, Math.min(30, parseInt(attributes.kenBurnsAmount, 10) || 15))
+    const contentAnim        = attributes.contentAnim !== false
+    const textShadow         = attributes.textShadow !== false
+    const overlayGradient    = attributes.overlayGradient !== false
+    const constrainContent   = attributes.constrainContent !== false
+    const objectPosition     = ['top center', 'center center', 'bottom center'].includes(attributes.objectPosition)
+      ? attributes.objectPosition : 'center center'
+    const contentPosition    = attributes.contentPosition || 'bottom center'
+    const headingFontSize    = validUnit.test(attributes.headingFontSize || '')       ? attributes.headingFontSize       : '2.5rem'
+    const descFontSize       = validUnit.test(attributes.descriptionFontSize || '')   ? attributes.descriptionFontSize   : '1rem'
+    const pretitleFontSize   = validUnit.test(attributes.pretitleFontSize || '')      ? attributes.pretitleFontSize      : '0.75rem'
+    const headingTag         = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span'].includes(attributes.headingTag)
+      ? attributes.headingTag : 'h2'
+
+    const cpMap = {
+      'top left':      { justify: 'flex-start', align: 'flex-start', text: 'left' },
+      'top center':    { justify: 'flex-start', align: 'center',     text: 'center' },
+      'top right':     { justify: 'flex-start', align: 'flex-end',   text: 'right' },
+      'center left':   { justify: 'center',     align: 'flex-start', text: 'left' },
+      'center center': { justify: 'center',     align: 'center',     text: 'center' },
+      'center right':  { justify: 'center',     align: 'flex-end',   text: 'right' },
+      'bottom left':   { justify: 'flex-end',   align: 'flex-start', text: 'left' },
+      'bottom center': { justify: 'flex-end',   align: 'center',     text: 'center' },
+      'bottom right':  { justify: 'flex-end',   align: 'flex-end',   text: 'right' },
+    }
+    const cf = cpMap[contentPosition] || cpMap['bottom center']
+
+    const containerStyle = {
+      '--wpff-slider-height':      sliderHeight,
+      '--wpff-anim-duration':      slideDuration + 's',
+      '--wpff-object-position':    objectPosition,
+      '--wpff-content-justify':    cf.justify,
+      '--wpff-content-align':      cf.align,
+      '--wpff-content-text-align': cf.text,
+      '--wpff-heading-size':       headingFontSize,
+      '--wpff-desc-size':          descFontSize,
+      '--wpff-kb-scale':           (kenBurnsAmount / 100).toFixed(2),
+      '--wpff-kb-pan':             (kenBurnsAmount / 5).toFixed(1) + '%',
+      '--wpff-pretitle-size':      pretitleFontSize,
+    }
+    if (sliderHeightMobile)          containerStyle['--wpff-slider-height-mobile'] = sliderHeightMobile
+    if (aspectRatio)                 containerStyle['--wpff-slider-aspect-ratio']  = aspectRatio
+    if (attributes.headingColor)     containerStyle['--wpff-heading-color']        = attributes.headingColor
+    if (attributes.descriptionColor) containerStyle['--wpff-desc-color']           = attributes.descriptionColor
+    if (attributes.pretitleColor)    containerStyle['--wpff-pretitle-color']       = attributes.pretitleColor
+
+    const kbVariants = ['wpff-kb-1', 'wpff-kb-2', 'wpff-kb-3', 'wpff-kb-4']
+
+    const slideEls = slides.map((slide, i) => {
+      const isFirst   = i === 0
+      const tag       = headingTag === 'h1' && i > 0 ? 'h2' : headingTag
+      const kbClass   = kenBurns ? kbVariants[i % kbVariants.length] : ''
+      const slideCls  = 'wpff-slide' + (isFirst ? ' wpff-slide--active' : '')
+      const linkUrl   = slide.linkUrl || ''
+      const linkStyle = ['full', 'button'].includes(slide.linkStyle || 'full') ? (slide.linkStyle || 'full') : 'full'
+      const fullLink  = !!(linkUrl && linkStyle === 'full')
+      const useButton = !!(linkUrl && linkStyle === 'button')
+      const newTab    = !!slide.linkNewTab
+      const pretitle  = slide.pretitle || ''
+      const heading   = slide.heading || ''
+      const desc      = slide.description || ''
+
+      const imgEl = el('div', { className: 'wpff-slide__image-wrap' },
+        el('img', {
+          src:       slide.imageUrl,
+          alt:       slide.imageAlt || '',
+          className: 'wpff-slide__image ' + kbClass,
+          style:     { objectPosition },
+          loading:   isFirst ? 'eager' : 'lazy'
+        })
+      )
+
+      const contentChildren = []
+      if (pretitle) {
+        contentChildren.push(el('span', { key: 'pt', className: 'wpff-slide__pretitle' }, pretitle))
+      }
+      if (heading) {
+        const hStyle = {}
+        if (slide.headingColorOverride) hStyle.color           = slide.headingColorOverride
+        if (slide.headingBgColor)       hStyle.backgroundColor = slide.headingBgColor
+        if (slide.headingBgPadding)     hStyle.padding         = slide.headingBgPadding
+        contentChildren.push(el(tag, {
+          key:       'h',
+          className: 'wpff-slide__heading' + (slide.headingBgColor ? ' wpff-slide__heading--has-bg' : ''),
+          style:     hStyle
+        }, heading))
+      }
+      if (desc) {
+        const dStyle = {}
+        if (slide.descColorOverride) dStyle.color           = slide.descColorOverride
+        if (slide.descBgColor)       dStyle.backgroundColor = slide.descBgColor
+        if (slide.descBgPadding)     dStyle.padding         = slide.descBgPadding
+        const descParas = desc.split(/\n\n+/).filter(Boolean).map((para, pi) => {
+          const parts = para.split('\n')
+          const paraChildren = []
+          parts.forEach((part, li) => {
+            if (li > 0) paraChildren.push(el('br', { key: 'br' + li }))
+            if (part)   paraChildren.push(part)
+          })
+          return el('p', { key: pi }, paraChildren)
+        })
+        contentChildren.push(el('div', {
+          key:       'd',
+          className: 'wpff-slide__description' + (slide.descBgColor ? ' wpff-slide__description--has-bg' : ''),
+          style:     dStyle
+        }, descParas))
+      }
+      if (useButton) {
+        const btnProps = { key: 'btn', className: 'wpff-slide__button', href: linkUrl }
+        if (newTab) { btnProps.target = '_blank'; btnProps.rel = 'noopener noreferrer' }
+        contentChildren.push(el('a', btnProps, slide.linkText || __('Learn More', 'wpff-slider')))
+      }
+
+      const slideChildren = [imgEl]
+      if (contentChildren.length) {
+        const contentCls = 'wpff-slide__content'
+          + (textShadow ? '' : ' wpff-slide__content--no-shadow')
+          + (overlayGradient ? '' : ' wpff-slide__content--no-gradient')
+          + (useButton ? ' wpff-slide__content--has-button' : '')
+          + (constrainContent ? ' wpff-slide__content--constrained' : '')
+        slideChildren.push(el('div', { className: contentCls },
+          el('div', {
+            className: 'wpff-slide__content-inner',
+            style: { '--wpff-inner-align': cf.align, '--wpff-inner-text-align': cf.text }
+          }, contentChildren)
+        ))
+      }
+
+      const slideProps = { key: slide.id || i, className: slideCls, 'aria-hidden': isFirst ? 'false' : 'true' }
+      if (fullLink) {
+        slideProps.href = linkUrl
+        if (newTab) { slideProps.target = '_blank'; slideProps.rel = 'noopener noreferrer' }
+        return el('a', slideProps, slideChildren)
+      }
+      return el('div', slideProps, slideChildren)
+    })
+
+    let dotsEl = null
+    if (slides.length > 1) {
+      const dotEls = slides.map((slide, i) =>
+        el('button', {
+          key:            i,
+          type:           'button',
+          className:      'wpff-slider__dot' + (i === 0 ? ' wpff-slider__dot--active' : ''),
+          'aria-pressed': i === 0 ? 'true' : 'false',
+          'aria-label':   __('Go to slide', 'wpff-slider') + ' ' + (i + 1),
+          'data-index':   i
+        })
+      )
+      dotsEl = el('div', { className: 'wpff-slider__dots', role: 'group' }, dotEls)
+    }
+
+    return el('div', {
+      className:              'wpff-slider wpff-slider-ssr-preview' + (contentAnim ? ' wpff-slider--content-anim' : ''),
+      role:                   'region',
+      style:                  containerStyle,
+      'data-slide-duration':  slideDuration,
+      'data-object-position': objectPosition
+    },
+      el('div', { className: 'wpff-slider__track' }, slideEls),
+      dotsEl
+    )
   }
 
   // -------------------------------------------------------------------------
@@ -548,7 +730,7 @@
         )
       )
 
-      /* ---- slide cards (edit controls only — preview via ServerSideRender) ---- */
+      /* ---- slide cards (edit controls only — preview via buildPreview) ---- */
 
       const cards = slides.map(function (slide, idx) {
         return el(
@@ -864,11 +1046,7 @@
         mainContent = el(
           'div',
           { className: 'wpff-slides-list' },
-          el(ServerSideRender, {
-            block: 'wpff-slider/slider',
-            attributes: attributes,
-            className: 'wpff-slider-ssr-preview'
-          }),
+          buildPreview(attributes),
           cards,
           el(
             Button,
