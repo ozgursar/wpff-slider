@@ -278,13 +278,24 @@
   flex-shrink: 0;
 }
 
-/* ServerSideRender live preview
+/* Live preview — sticky so it stays visible while scrolling through slide cards.
+   The wrapper sticks from top:0 and carries the editor background so nothing
+   bleeds through the gap above the preview.
    --------------------------------------------------------------------------- */
+
+.wpff-preview-sticky-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding-top: 16px;
+  background: #f0f0f1;
+}
 
 .wpff-slider-ssr-preview {
   margin-bottom: 12px;
   border-radius: 4px;
   overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
 }
 
 /* Linked slides use cursor:pointer from the frontend CSS.

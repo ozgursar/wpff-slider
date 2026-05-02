@@ -1046,7 +1046,7 @@
         mainContent = el(
           'div',
           { className: 'wpff-slides-list' },
-          buildPreview(attributes),
+          el('div', { className: 'wpff-preview-sticky-wrap' }, buildPreview(attributes)),
           cards,
           el(
             Button,
